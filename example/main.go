@@ -10,10 +10,11 @@ import (
 )
 
 func main() {
-	// how to get table of currency exchange rates
-	// published on 12 Nov 2020, function TableByDate fetch data,
-	// then one can get dat a from slice of nbpTable.Exchange structure (or
-	// nbpTable.ExchangeC structure, depending of the table type)
+	// How to get table A of currency exchange rates published
+	// on 12 Nov 2020: function TableByDate("2020-11-12") fetch data, then
+	// one can get data from nbpTable.Exchange structures (or
+	// nbpTable.ExchangeC structures, depending of the type of
+	// table of exchange rates)
 	var err error
 	var tableNo string
 
@@ -125,7 +126,7 @@ func main() {
 	}
 	fmt.Println()
 
-	// today's gold price: function GetPriceToday return GoldPrice struct
+	// today's gold price: function GetPriceToday returns GoldPrice struct
 	var price nbpapi.GoldRate
 	gold := nbpapi.NewGold()
 
@@ -138,7 +139,7 @@ func main() {
 	}
 	fmt.Println()
 
-	// current gold price: function GetPriceCurrent return GoldPrice struct
+	// current gold price: function GetPriceCurrent returns GoldPrice struct
 	price, err = gold.GetPriceCurrent()
 	if err != nil {
 		fmt.Println(err)
@@ -148,7 +149,7 @@ func main() {
 	}
 	fmt.Println()
 
-	// gold price on November 12, 2020: function GetPriceByDate return
+	// gold price on November 12, 2020: function GetPriceByDate returns
 	// slice of GoldPrice struct, in case of date it is always 1 element,
 	// in case of range of date is more
 	var prices []nbpapi.GoldRate
