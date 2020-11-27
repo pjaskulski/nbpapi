@@ -6,25 +6,25 @@ Library used in the Kursnbp project: [https://github.com/pjaskulski/kursnbp](htt
 Example:
     
 ```go
-    // How to get table A of currency exchange rates published
-	// on 12 Nov 2020: function TableByDate("2020-11-12") fetch data, then
-	// one can get data from nbpTable.Exchange structures (or
-	// nbpTable.ExchangeC structures, depending of the type of
-	// table of exchange rates)
-	var tableNo string
+// How to get table A of currency exchange rates published
+// on 12 Nov 2020: function TableByDate("2020-11-12") fetch data, then
+// one can get data from nbpTable.Exchange structures (or
+// nbpTable.ExchangeC structures, depending of the type of
+// table of exchange rates)
+var tableNo string
 
-	nbpTable := nbpapi.NewTable("A")
-	err: = nbpTable.TableByDate("2020-11-12")
-	if err != nil {
-		log.Fatal(err)
+nbpTable := nbpapi.NewTable("A")
+err: = nbpTable.TableByDate("2020-11-12")
+if err != nil {
+	log.Fatal(err)
+}
+
+for _, item := range nbpTable.Exchange {
+	tableNo = item.No
+	for _, currencyItem := range item.Rates {
+		fmt.Println(tableNo, currencyItem.Code, currencyItem.Currency, currencyItem.Mid)
 	}
-
-	for _, item := range nbpTable.Exchange {
-		tableNo = item.No
-		for _, currencyItem := range item.Rates {
-			fmt.Println(tableNo, currencyItem.Code, currencyItem.Currency, currencyItem.Mid)
-		}
-    }
+}
 ```
 
 Output:
@@ -44,18 +44,19 @@ Output:
 Example: 
     
 ```go
-    // today's gold price: function GetPriceToday returns GoldPrice struct
-    var price nbpapi.GoldRate
-    var err error
-	gold := nbpapi.NewGold()
+// today's gold price: function GetPriceToday returns GoldPrice struct
+var price nbpapi.GoldRate
+var err error
 
-	price, err = gold.GetPriceToday()
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println("Publication date: ", price.Data)
-		fmt.Println("Price of 1g of gold (PLN): ", price.Price)
-    }
+gold := nbpapi.NewGold()
+
+price, err = gold.GetPriceToday()
+if err != nil {
+	fmt.Println(err)
+} else {
+	fmt.Println("Publication date: ", price.Data)
+	fmt.Println("Price of 1g of gold (PLN): ", price.Price)
+}
 ```
 
 Output: 
