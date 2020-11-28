@@ -98,12 +98,6 @@ More examples in the \ example folder.
 package nbpapi // import "github.com/pjaskulski/nbpapi"
 
 
-FUNCTIONS
-
-func setLang(lang string)
-    setLang function (language for output functions)
-
-
 TYPES
 
 type ExchangeTable struct {
