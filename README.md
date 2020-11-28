@@ -1,9 +1,35 @@
 # nbpapi
+
+[![GitHub](https://img.shields.io/github/license/pjaskulski/nbpapi)](https://opensource.org/licenses/MIT) 
+![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/pjaskulski/nbpapi?include_prereleases) 
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/pjaskulski/nbpapi) 
+[![go report](https://goreportcard.com/badge/github.com/pjaskulski/kursnbp)](https://goreportcard.com/report/github.com/pjaskulski/nbpapi) 
+
+
 Go library for NBP (National Bank of Poland) api 
 
 Library used in the kursNBP project: [https://github.com/pjaskulski/kursnbp](https://github.com/pjaskulski/kursnbp)
 
-Example:
+
+To install and use:
+
+```
+go get https://github.com/pjaskulski/nbpapi
+```
+
+To clone and invoke the tests:
+
+```bash
+git clone https://github.com/pjaskulski/nbpapi
+
+cd nbpapi
+
+make test
+
+make cover
+```
+
+## Examples:
     
 ```go
 // How to get table A of currency exchange rates published
@@ -40,8 +66,7 @@ Output:
     221/A/NBP/2020 HUF forint (Węgry) 0.012648
     221/A/NBP/2020 CHF frank szwajcarski 4.1573
     [...]
-
-Example: 
+ 
     
 ```go
 // today's gold price: function GetPriceToday returns GoldPrice struct
@@ -64,7 +89,10 @@ Output:
     Publication date:  2020-11-27
     Price of 1g of gold (PLN):  218.41
 
-Documentation:
+More examples in the \ example folder.
+
+
+## Documentation:
 
 ```
 package nbpapi // import "github.com/pjaskulski/nbpapi"
@@ -249,3 +277,7 @@ type Rate struct {
     Rate type
 
 ```
+
+## TODO
+
+- more tests
