@@ -12,7 +12,6 @@ package nbpapi
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 	"text/tabwriter"
@@ -83,7 +82,7 @@ func (c *NBPCurrency) CurrencyRaw(dFlag string, lFlag int, cFlag string, repForm
 	address := getCurrencyAddress(c.tableType, dFlag, lFlag, cFlag)
 	c.result, err = getData(address, repFormat)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	return err
@@ -97,7 +96,7 @@ func (c *NBPCurrency) CurrencyByDate(dFlag string, cFlag string) error {
 	address := getCurrencyAddress(c.tableType, dFlag, 0, cFlag)
 	c.result, err = getData(address, "json")
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	if c.tableType != "C" {
@@ -106,7 +105,7 @@ func (c *NBPCurrency) CurrencyByDate(dFlag string, cFlag string) error {
 		err = json.Unmarshal(c.result, &c.ExchangeC)
 	}
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	return err
@@ -120,7 +119,7 @@ func (c *NBPCurrency) CurrencyLast(cFlag string, lFlag int) error {
 	address := getCurrencyAddress(c.tableType, "", lFlag, cFlag)
 	c.result, err = getData(address, "json")
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	if c.tableType != "C" {
@@ -129,7 +128,7 @@ func (c *NBPCurrency) CurrencyLast(cFlag string, lFlag int) error {
 		err = json.Unmarshal(c.result, &c.ExchangeC)
 	}
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	return err
@@ -143,7 +142,7 @@ func (c *NBPCurrency) CurrencyToday(cFlag string) error {
 	address := getCurrencyAddress(c.tableType, "today", 0, cFlag)
 	c.result, err = getData(address, "json")
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	if c.tableType != "C" {
@@ -152,7 +151,7 @@ func (c *NBPCurrency) CurrencyToday(cFlag string) error {
 		err = json.Unmarshal(c.result, &c.ExchangeC)
 	}
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	return err
@@ -162,11 +161,12 @@ func (c *NBPCurrency) CurrencyToday(cFlag string) error {
 // and return Rate struct (or error)
 func (c *NBPCurrency) GetRateCurrent(cFlag string) (Rate, error) {
 	var err error
+	var rate Rate
 
 	address := getCurrencyAddress(c.tableType, "current", 0, cFlag)
 	c.result, err = getData(address, "json")
 	if err != nil {
-		log.Fatal(err)
+		return rate, err
 	}
 
 	if c.tableType != "C" {
@@ -175,10 +175,9 @@ func (c *NBPCurrency) GetRateCurrent(cFlag string) (Rate, error) {
 		err = json.Unmarshal(c.result, &c.ExchangeC)
 	}
 	if err != nil {
-		log.Fatal(err)
+		return rate, err
 	}
 
-	var rate Rate
 	if c.tableType != "C" {
 		rate.No = c.Exchange.Rates[0].No
 		rate.EffectiveDate = c.Exchange.Rates[0].EffectiveDate
@@ -200,11 +199,12 @@ func (c *NBPCurrency) GetRateCurrent(cFlag string) (Rate, error) {
 // and returns Rate struct (or error)
 func (c *NBPCurrency) GetRateToday(cFlag string) (Rate, error) {
 	var err error
+	var rate Rate
 
 	address := getCurrencyAddress(c.tableType, "today", 0, cFlag)
 	c.result, err = getData(address, "json")
 	if err != nil {
-		log.Fatal(err)
+		return rate, err
 	}
 
 	if c.tableType != "C" {
@@ -213,10 +213,9 @@ func (c *NBPCurrency) GetRateToday(cFlag string) (Rate, error) {
 		err = json.Unmarshal(c.result, &c.ExchangeC)
 	}
 	if err != nil {
-		log.Fatal(err)
+		return rate, err
 	}
 
-	var rate Rate
 	if c.tableType != "C" {
 		rate.No = c.Exchange.Rates[0].No
 		rate.EffectiveDate = c.Exchange.Rates[0].EffectiveDate
@@ -238,11 +237,8 @@ func (c *NBPCurrency) GetRateToday(cFlag string) (Rate, error) {
 // and returns Rate struct (or error)
 func (c *NBPCurrency) GetRateByDate(code string, date string) ([]Rate, error) {
 	var err error
-
-	err = CheckArg("currency", c.tableType, date, 0, "table", code)
-	if err != nil {
-		return nil, err
-	}
+	var rates []Rate
+	var rate Rate
 
 	address := getCurrencyAddress(c.tableType, date, 0, code)
 	c.result, err = getData(address, "json")
@@ -259,8 +255,6 @@ func (c *NBPCurrency) GetRateByDate(code string, date string) ([]Rate, error) {
 		return nil, err
 	}
 
-	var rates []Rate
-	var rate Rate
 	if c.tableType != "C" {
 		for _, item := range c.Exchange.Rates {
 			rate.No = item.No
@@ -288,10 +282,14 @@ func (c *NBPCurrency) GetRateByDate(code string, date string) ([]Rate, error) {
 // depending on the tableType field:
 // for type A and B tables a column with an average rate is printed,
 // for type C two columns: buy price and sell price
-func (c *NBPCurrency) GetPrettyOutput() string {
+func (c *NBPCurrency) GetPrettyOutput(lang string) string {
 	const padding = 3
 	var builder strings.Builder
 	var output string
+
+	// output language
+	setLang(lang)
+
 	w := tabwriter.NewWriter(&builder, 0, 0, padding, ' ', tabwriter.Debug)
 
 	if c.tableType != "C" {
@@ -331,8 +329,11 @@ func (c *NBPCurrency) GetPrettyOutput() string {
 // in the form of CSV (data separated by a comma), depending on the
 // tableType field: for type A and B tables a column with an average
 // rate is printed, for type C two columns: buy price and sell price
-func (c *NBPCurrency) GetCSVOutput() string {
+func (c *NBPCurrency) GetCSVOutput(lang string) string {
 	var output string = ""
+
+	// output language
+	setLang(lang)
 
 	if c.tableType != "C" {
 		output += fmt.Sprintln(l.Get("TABLE,DATE,AVERAGE (PLN)"))

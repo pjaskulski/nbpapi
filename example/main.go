@@ -4,7 +4,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/pjaskulski/nbpapi"
 )
@@ -21,13 +20,13 @@ func main() {
 	nbpTable := nbpapi.NewTable("A")
 	err = nbpTable.TableByDate("2020-11-12")
 	if err != nil {
-		log.Fatal(err)
-	}
-
-	for _, item := range nbpTable.Exchange {
-		tableNo = item.No
-		for _, currencyItem := range item.Rates {
-			fmt.Println(tableNo, currencyItem.Code, currencyItem.Currency, currencyItem.Mid)
+		fmt.Println(err)
+	} else {
+		for _, item := range nbpTable.Exchange {
+			tableNo = item.No
+			for _, currencyItem := range item.Rates {
+				fmt.Println(tableNo, currencyItem.Code, currencyItem.Currency, currencyItem.Mid)
+			}
 		}
 	}
 	fmt.Println()
@@ -37,11 +36,11 @@ func main() {
 	tableA, err = nbpTable.GetTableCurrent()
 	if err != nil {
 		fmt.Println(err)
-	}
-
-	for _, tItem := range tableA {
-		for _, item := range tItem.Rates {
-			fmt.Println(tItem.No, item.Code, item.Currency, item.Mid)
+	} else {
+		for _, tItem := range tableA {
+			for _, item := range tItem.Rates {
+				fmt.Println(tItem.No, item.Code, item.Currency, item.Mid)
+			}
 		}
 	}
 	fmt.Println()
@@ -51,19 +50,17 @@ func main() {
 	nbpMid := nbpapi.NewCurrency("A")
 	err = nbpMid.CurrencyLast("CHF", 5)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 
-	output := nbpMid.GetCSVOutput()
-	fmt.Println(output)
+	// english version
+	fmt.Println(nbpMid.GetCSVOutput("en"))
 	fmt.Println()
 
 	// polish version
-	nbpapi.SetLang("pl")
-	fmt.Println(nbpMid.GetCSVOutput())
+	fmt.Println(nbpMid.GetCSVOutput("pl"))
 	fmt.Println()
 
-	nbpapi.SetLang("en")
 	// how to get today's rate of CHF, table C (bid, ask - buy and sell
 	// exchange rate), function GetCurencyToday, returns error or nil and
 	// populates slice ExchangeC, the currency rate is taken from the first

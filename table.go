@@ -13,7 +13,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 	"text/tabwriter"
@@ -78,7 +77,7 @@ func (t *NBPTable) TableRaw(dFlag string, lFlag int, repFormat string) error {
 	address := getTableAddress(t.tableType, dFlag, lFlag)
 	t.result, err = getData(address, repFormat)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	return err
@@ -92,7 +91,7 @@ func (t *NBPTable) TableByDate(dFlag string) error {
 	address := getTableAddress(t.tableType, dFlag, 0)
 	t.result, err = getData(address, "json")
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	if t.tableType != "C" {
@@ -101,7 +100,7 @@ func (t *NBPTable) TableByDate(dFlag string) error {
 		err = json.Unmarshal(t.result, &t.ExchangeC)
 	}
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	return err
@@ -115,7 +114,7 @@ func (t *NBPTable) TableLast(lFlag int) error {
 	address := getTableAddress(t.tableType, "", lFlag)
 	t.result, err = getData(address, "json")
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	if t.tableType != "C" {
@@ -124,7 +123,7 @@ func (t *NBPTable) TableLast(lFlag int) error {
 		err = json.Unmarshal(t.result, &t.ExchangeC)
 	}
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	return err
@@ -136,18 +135,18 @@ func (t *NBPTable) GetTableCurrent() ([]ExchangeTable, error) {
 	var err error
 
 	if t.tableType == "C" {
-		return nil, errors.New("GetTableCurrent function does not work with type C exchange rate tables, use the GetTableCCurrent function")
+		return nil, errors.New("Invalid function call context, use GetTableCCurrent")
 	}
 
 	address := getTableAddress(t.tableType, "current", 0)
 	t.result, err = getData(address, "json")
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	err = json.Unmarshal(t.result, &t.Exchange)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	return t.Exchange, err
@@ -159,18 +158,18 @@ func (t *NBPTable) GetTableCCurrent() ([]ExchangeTableC, error) {
 	var err error
 
 	if t.tableType != "C" {
-		return nil, errors.New("GetTableCCurrent function does not work with type A or B exchange rate tables, use the GetTableCurrent function")
+		return nil, errors.New("Invalid function call context, use GetTableCurrent")
 	}
 
 	address := getTableAddress(t.tableType, "current", 0)
 	t.result, err = getData(address, "json")
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	err = json.Unmarshal(t.result, &t.ExchangeC)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	return t.ExchangeC, err
@@ -180,10 +179,14 @@ func (t *NBPTable) GetTableCCurrent() ([]ExchangeTableC, error) {
 // formatted table, depending on the tableType field: for type A and B tables
 // a column with an average rate is printed, for type C two columns:
 // buy price and sell price
-func (t *NBPTable) GetPrettyOutput() string {
+func (t *NBPTable) GetPrettyOutput(lang string) string {
 	const padding = 3
 	var builder strings.Builder
 	var output string
+
+	// output language
+	setLang(lang)
+
 	w := tabwriter.NewWriter(&builder, 0, 0, padding, ' ', tabwriter.Debug)
 
 	if t.tableType != "C" {
@@ -233,9 +236,12 @@ func (t *NBPTable) GetPrettyOutput() string {
 // in the form of CSV (data separated by a comma), depending on the
 // tableType field: for type A and B tables a column with an average
 // rate is printed, for type C two columns: buy price and sell price
-func (t *NBPTable) GetCSVOutput() string {
+func (t *NBPTable) GetCSVOutput(lang string) string {
 	var tableNo string
 	var output string = ""
+
+	// output language
+	setLang(lang)
 
 	if t.tableType != "C" {
 		output += fmt.Sprintln(l.Get("TABLE,CODE,NAME,AVERAGE (PLN)"))
