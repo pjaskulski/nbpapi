@@ -75,7 +75,25 @@ func NewCurrency(tFlag string) *NBPCurrency {
 
 // Public func
 
-// CurrencyRaw - function downloads data in json or xml form
+/*
+CurrencyRaw - function downloads data in json or xml form
+
+Function returns error or nil
+
+Parameters:
+
+    dFlag - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
+	or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
+	(rate for today) or 'current' - current table / rate (last published)
+
+	lFlag - as an alternative to date, the last <n> tables/rates
+	can be retrieved
+
+	cFlag - ISO 4217 currency code, depending on the type of the
+    table available currencies may vary
+
+	repFormat - 'json' or 'xml'
+*/
 func (c *NBPCurrency) CurrencyRaw(dFlag string, lFlag int, cFlag string, repFormat string) error {
 	var err error
 
@@ -88,8 +106,21 @@ func (c *NBPCurrency) CurrencyRaw(dFlag string, lFlag int, cFlag string, repForm
 	return err
 }
 
-// CurrencyByDate - function downloads and writes data to exchange (exchangeC) slice,
-// raw data (json) still available in result field
+/*
+CurrencyByDate - function downloads and writes data to exchange (exchangeC) slice,
+raw data (json) still available in result field
+
+Function returns error or nil
+
+Parameters:
+
+    dFlag - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
+	or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
+	(rate for today) or 'current' - current table / rate (last published)
+
+	cFlag - ISO 4217 currency code, depending on the type of the
+    table available currencies may vary
+*/
 func (c *NBPCurrency) CurrencyByDate(dFlag string, cFlag string) error {
 	var err error
 
@@ -111,8 +142,20 @@ func (c *NBPCurrency) CurrencyByDate(dFlag string, cFlag string) error {
 	return err
 }
 
-// CurrencyLast - function downloads and writes data to exchange (exchangeC) slice,
-// raw data (json) still available in result field
+/*
+CurrencyLast - function downloads and writes data to exchange (exchangeC) slice,
+raw data (json) still available in result field
+
+Function returns error or nil
+
+Parameters:
+
+	cFlag - ISO 4217 currency code, depending on the type of the
+    table available currencies may vary
+
+	lFlag - as an alternative to date, the last <n> tables/rates
+	can be retrieved
+*/
 func (c *NBPCurrency) CurrencyLast(cFlag string, lFlag int) error {
 	var err error
 
@@ -134,8 +177,17 @@ func (c *NBPCurrency) CurrencyLast(cFlag string, lFlag int) error {
 	return err
 }
 
-// CurrencyToday - function downloads and writes data to exchange (exchangeC) slice,
-// raw data (json) still available in result field
+/*
+CurrencyToday - function downloads and writes data to exchange (exchangeC) slice,
+raw data (json) still available in result field
+
+Function returns error or nil
+
+Parameters:
+
+	cFlag - ISO 4217 currency code, depending on the type of the
+    table available currencies may vary
+*/
 func (c *NBPCurrency) CurrencyToday(cFlag string) error {
 	var err error
 
@@ -157,8 +209,15 @@ func (c *NBPCurrency) CurrencyToday(cFlag string) error {
 	return err
 }
 
-// GetRateCurrent - function downloads current currency exchange rate
-// and return Rate struct (or error)
+/*
+GetRateCurrent - function downloads current currency exchange rate
+and return Rate struct (or error)
+
+Parameters:
+
+	cFlag - ISO 4217 currency code, depending on the type of the
+    table available currencies may vary
+*/
 func (c *NBPCurrency) GetRateCurrent(cFlag string) (Rate, error) {
 	var err error
 	var rate Rate
@@ -195,8 +254,15 @@ func (c *NBPCurrency) GetRateCurrent(cFlag string) (Rate, error) {
 	return rate, err
 }
 
-// GetRateToday - function downloads today's currency exchange rate
-// and returns Rate struct (or error)
+/*
+GetRateToday - function downloads today's currency exchange rate
+and returns Rate struct (or error)
+
+Parameters:
+
+	cFlag - ISO 4217 currency code, depending on the type of the
+    table available currencies may vary
+*/
 func (c *NBPCurrency) GetRateToday(cFlag string) (Rate, error) {
 	var err error
 	var rate Rate
@@ -233,8 +299,19 @@ func (c *NBPCurrency) GetRateToday(cFlag string) (Rate, error) {
 	return rate, err
 }
 
-// GetRateByDate - function downloads today's currency exchange rate
-// and returns Rate struct (or error)
+/*
+GetRateByDate - function downloads today's currency exchange rate
+and returns slice of Rate struct (or error)
+
+Parameters:
+
+	code - ISO 4217 currency code, depending on the type of the
+	table available currencies may vary
+
+	date - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
+	or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
+	(rate for today) or 'current' - current table / rate (last published)
+*/
 func (c *NBPCurrency) GetRateByDate(code string, date string) ([]Rate, error) {
 	var err error
 	var rates []Rate
@@ -278,10 +355,16 @@ func (c *NBPCurrency) GetRateByDate(code string, date string) ([]Rate, error) {
 	return rates, err
 }
 
-// GetPrettyOutput - function returns exchange rates as formatted table
-// depending on the tableType field:
-// for type A and B tables a column with an average rate is printed,
-// for type C two columns: buy price and sell price
+/*
+GetPrettyOutput - function returns exchange rates as formatted table
+depending on the tableType field:
+for type A and B tables a column with an average rate is printed,
+for type C two columns: buy price and sell price
+
+Parameters:
+
+	lang - 'en' or 'pl'
+*/
 func (c *NBPCurrency) GetPrettyOutput(lang string) string {
 	const padding = 3
 	var builder strings.Builder
@@ -325,10 +408,16 @@ func (c *NBPCurrency) GetPrettyOutput(lang string) string {
 	return output + builder.String()
 }
 
-// GetCSVOutput - function returns currency rates,
-// in the form of CSV (data separated by a comma), depending on the
-// tableType field: for type A and B tables a column with an average
-// rate is printed, for type C two columns: buy price and sell price
+/*
+GetCSVOutput - function returns currency rates,
+in the form of CSV (data separated by a comma), depending on the
+tableType field: for type A and B tables a column with an average
+rate is printed, for type C two columns: buy price and sell price
+
+Parameters:
+
+	lang - 'en' or 'pl'
+*/
 func (c *NBPCurrency) GetCSVOutput(lang string) string {
 	var output string = ""
 

@@ -137,16 +137,64 @@ func (c *NBPCurrency) CurrencyByDate(dFlag string, cFlag string) error
     CurrencyByDate - function downloads and writes data to exchange (exchangeC)
     slice, raw data (json) still available in result field
 
+
+    Function returns error or nil
+
+    Parameters:
+
+            dFlag - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
+        	or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
+        	(rate for today) or 'current' - current table / rate (last published)
+
+        	cFlag - ISO 4217 currency code, depending on the type of the
+            table available currencies may vary
+
 func (c *NBPCurrency) CurrencyLast(cFlag string, lFlag int) error
     CurrencyLast - function downloads and writes data to exchange (exchangeC)
     slice, raw data (json) still available in result field
 
+
+    Function returns error or nil
+
+    Parameters:
+
+        	cFlag - ISO 4217 currency code, depending on the type of the
+            table available currencies may vary
+
+        	lFlag - as an alternative to date, the last <n> tables/rates
+        	can be retrieved
+
 func (c *NBPCurrency) CurrencyRaw(dFlag string, lFlag int, cFlag string, repFormat string) error
     CurrencyRaw - function downloads data in json or xml form
+
+
+    Function returns error or nil
+
+    Parameters:
+
+            dFlag - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
+        	or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
+        	(rate for today) or 'current' - current table / rate (last published)
+
+        	lFlag - as an alternative to date, the last <n> tables/rates
+        	can be retrieved
+
+        	cFlag - ISO 4217 currency code, depending on the type of the
+            table available currencies may vary
+
+        	repFormat - 'json' or 'xml'
 
 func (c *NBPCurrency) CurrencyToday(cFlag string) error
     CurrencyToday - function downloads and writes data to exchange (exchangeC)
     slice, raw data (json) still available in result field
+
+
+    Function returns error or nil
+
+    Parameters:
+
+        	cFlag - ISO 4217 currency code, depending on the type of the
+            table available currencies may vary
 
 func (c *NBPCurrency) GetCSVOutput(lang string) string
     GetCSVOutput - function returns currency rates, in the form of CSV (data
@@ -154,22 +202,49 @@ func (c *NBPCurrency) GetCSVOutput(lang string) string
     tables a column with an average rate is printed, for type C two columns: buy
     price and sell price
 
+    Parameters:
+
+        lang - 'en' or 'pl'
+
 func (c *NBPCurrency) GetPrettyOutput(lang string) string
     GetPrettyOutput - function returns exchange rates as formatted table
     depending on the tableType field: for type A and B tables a column with an
     average rate is printed, for type C two columns: buy price and sell price
 
+    Parameters:
+
+        lang - 'en' or 'pl'
+
 func (c *NBPCurrency) GetRateByDate(code string, date string) ([]Rate, error)
     GetRateByDate - function downloads today's currency exchange rate and
-    returns Rate struct (or error)
+    returns slice of Rate struct (or error)
+
+    Parameters:
+
+        code - ISO 4217 currency code, depending on the type of the
+        table available currencies may vary
+
+        date - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
+        or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
+        (rate for today) or 'current' - current table / rate (last published)
 
 func (c *NBPCurrency) GetRateCurrent(cFlag string) (Rate, error)
     GetRateCurrent - function downloads current currency exchange rate and
     return Rate struct (or error)
 
+    Parameters:
+
+        	cFlag - ISO 4217 currency code, depending on the type of the
+            table available currencies may vary
+
 func (c *NBPCurrency) GetRateToday(cFlag string) (Rate, error)
     GetRateToday - function downloads today's currency exchange rate and returns
     Rate struct (or error)
+
+    Parameters:
+
+        	cFlag - ISO 4217 currency code, depending on the type of the
+            table available currencies may vary
 
 func (c *NBPCurrency) GetRawOutput() string
     GetRawOutput - function print just result of request (json or xml)
@@ -187,32 +262,79 @@ func (g *NBPGold) GetCSVOutput(lang string) string
     GetCSVOutput - function returns prices of gold in CSV format (comma
     separated data)
 
+    Parameters:
+
+        lang - 'en' or 'pl'
+
 func (g *NBPGold) GetPrettyOutput(lang string) string
     GetPrettyOutput - function returns a formatted table of gold prices
 
+    Parameters:
+
+        lang - 'en' or 'pl'
+
 func (g *NBPGold) GetPriceByDate(date string) ([]GoldRate, error)
-    GetPriceByDate - function returns gold prices (as slice od struct), by date
+    GetPriceByDate - function returns gold prices (as slice of struct), by date
     ("YYYY-MM-DD") or range of dates ("YYYY-MM-DD:YYYY-MM-DD")
 
+    Parameters:
+
+            date - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
+        	or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
+        	(price for today) or 'current' - current gold price (last published)
+
 func (g *NBPGold) GetPriceCurrent() (GoldRate, error)
-    GetPriceCurrent - function downloads and returns gold price,
+    GetPriceCurrent - function downloads and returns current gold price as
+    GoldRate struct
 
 func (g *NBPGold) GetPriceToday() (GoldRate, error)
-    GetPriceToday - function downloads and returns gold price,
+    GetPriceToday - function downloads and returns today's gold price, as
+    GoldRate struct
 
 func (g *NBPGold) GetRawOutput() string
     GetRawOutput - function returns just result of request (json or xml)
 
 func (g *NBPGold) GoldByDate(dFlag string) error
     GoldByDate - function downloads and writes data to goldRates slice, raw data
-    (json) still available in result field
+    (json) still available in NBPGold.result field
+
+
+    Function returns error or nil
+
+    Parameters:
+
+            dFlag - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
+        	or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
+        	(price for today) or 'current' - current gold price (last published)
 
 func (g *NBPGold) GoldLast(lFlag int) error
-    GoldLast - function downloads and writes data to goldRates slice, raw data
-    (json) still available in result field
+    GoldLast - function downloads and writes data to GoldRates slice, raw data
+    (json) still available in NBPGold.result field
+
+
+    Function returns error or nil
+
+    Parameters:
+
+        lFlag - as an alternative to date, the last <n> prices of gold
+        can be retrieved
 
 func (g *NBPGold) GoldRaw(dFlag string, lFlag int, repFormat string) error
     GoldRaw - function downloads data in json or xml form
+
+
+    Function returns error or nil
+
+    Parameters:
+
+            dFlag - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
+        	or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
+        	(price for today) or 'current' - current gold price (last published)
+
+        	lFlag - as an alternative to date, the last <n> prices of gold
+        	can be retrieved
+
+        	repFormat - 'json' or 'xml'
 
 type NBPTable struct {
 	Exchange  []ExchangeTable
@@ -230,33 +352,76 @@ func (t *NBPTable) GetCSVOutput(lang string) string
     field: for type A and B tables a column with an average rate is printed, for
     type C two columns: buy price and sell price
 
+    Parameters:
+
+        lang - 'en' or 'pl'
+
 func (t *NBPTable) GetPrettyOutput(lang string) string
     GetPrettyOutput - function returns tables of exchange rates as formatted
     table, depending on the tableType field: for type A and B tables a column
     with an average rate is printed, for type C two columns: buy price and sell
     price
 
+    Parameters:
+
+        lang - 'en' or 'pl'
+
 func (t *NBPTable) GetRawOutput() string
     GetRawOutput - function returns just result of request (json or xml)
 
 func (t *NBPTable) GetTableCCurrent() ([]ExchangeTableC, error)
     GetTableCCurrent - function downloads current table of currency exchange
-    rates and return slice of struct (or error), version for table C (bid, ask)
+    rates and return slice of struct ExchangeTableC (or error), version for
+    table C (bid, ask - buy, sell prices)
 
 func (t *NBPTable) GetTableCurrent() ([]ExchangeTable, error)
     GetTableCurrent - function downloads current table of currency exchange
-    rates and return slice of struct (or error), version for table A, B (mid)
+    rates and return slice of struct ExchangeTable (or error), version for table
+    A, B (mid - average price)
 
 func (t *NBPTable) TableByDate(dFlag string) error
-    TableByDate - function downloads and writes data to exchange (exchangeC)
-    slice, raw data (json) still available in result field
+    TableByDate - function downloads and writes data to NBPTable.Exchange
+    (NBPTable.ExchangeC) slice, raw data (json) still available in
+    NBPTable.result field
+
+
+    Function returns error or nil
+
+    Parameters:
+
+        dFlag - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
+        or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
+        (rate for today) or 'current' - current table / rate (last published)
 
 func (t *NBPTable) TableLast(lFlag int) error
-    TableLast - function downloads and writes data to exchange (exchangeC)
-    slice, raw data (json) still available in result field
+    TableLast - function downloads and writes data to NBPTable.Exchange
+    (NBPTable.ExchangeC) slice, raw data (json) still available in
+    NBPTable.result field
+
+
+    Function returns error or nil
+
+    Parameters:
+
+        lFlag - the last <n> tables/rates can be retrieved
 
 func (t *NBPTable) TableRaw(dFlag string, lFlag int, repFormat string) error
-    TableRaw - function downloads data in json or xml form
+    TableRaw - function downloads data in json or xml form, the data will be
+    placed as [] byte in the result field
+
+
+    Function returns error or nil
+
+    Parameters:
+
+            dFlag - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
+        	or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
+        	(rate for today) or 'current' - current table / rate (last published)
+
+        	lFlag - as an alternative to date, the last <n> tables/rates
+        	can be retrieved
+
+        	repFormat - 'json' or 'xml'
 
 type Rate struct {
 	No            string
@@ -271,4 +436,4 @@ type Rate struct {
 
 ## TODO
 
-- more tests
+- [ ]  more tests

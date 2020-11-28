@@ -70,7 +70,23 @@ func NewTable(tFlag string) *NBPTable {
 	}
 }
 
-// TableRaw - function downloads data in json or xml form
+/*
+TableRaw - function downloads data in json or xml form, the data will be
+placed as [] byte in the result field
+
+Function returns error or nil
+
+Parameters:
+
+    dFlag - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
+	or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
+	(rate for today) or 'current' - current table / rate (last published)
+
+	lFlag - as an alternative to date, the last <n> tables/rates
+	can be retrieved
+
+	repFormat - 'json' or 'xml'
+*/
 func (t *NBPTable) TableRaw(dFlag string, lFlag int, repFormat string) error {
 	var err error
 
@@ -83,8 +99,19 @@ func (t *NBPTable) TableRaw(dFlag string, lFlag int, repFormat string) error {
 	return err
 }
 
-// TableByDate - function downloads and writes data to exchange (exchangeC) slice,
-// raw data (json) still available in result field
+/*
+TableByDate - function downloads and writes data to NBPTable.Exchange
+(NBPTable.ExchangeC) slice, raw data (json) still available in
+NBPTable.result field
+
+Function returns error or nil
+
+Parameters:
+
+	dFlag - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
+	or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
+	(rate for today) or 'current' - current table / rate (last published)
+*/
 func (t *NBPTable) TableByDate(dFlag string) error {
 	var err error
 
@@ -106,8 +133,18 @@ func (t *NBPTable) TableByDate(dFlag string) error {
 	return err
 }
 
-// TableLast - function downloads and writes data to exchange (exchangeC) slice,
-// raw data (json) still available in result field
+/*
+TableLast - function downloads and writes data to NBPTable.Exchange
+(NBPTable.ExchangeC) slice, raw data (json) still available in
+NBPTable.result field
+
+Function returns error or nil
+
+Parameters:
+
+	lFlag - the last <n> tables/rates can be retrieved
+
+*/
 func (t *NBPTable) TableLast(lFlag int) error {
 	var err error
 
@@ -129,8 +166,11 @@ func (t *NBPTable) TableLast(lFlag int) error {
 	return err
 }
 
-// GetTableCurrent - function downloads current table of currency exchange
-// rates and return slice of struct (or error), version for table A, B (mid)
+/*
+GetTableCurrent - function downloads current table of currency exchange
+rates and return slice of struct ExchangeTable (or error), version for
+table A, B (mid - average price)
+*/
 func (t *NBPTable) GetTableCurrent() ([]ExchangeTable, error) {
 	var err error
 
@@ -152,8 +192,11 @@ func (t *NBPTable) GetTableCurrent() ([]ExchangeTable, error) {
 	return t.Exchange, err
 }
 
-// GetTableCCurrent - function downloads current table of currency exchange
-// rates and return slice of struct (or error), version for table C (bid, ask)
+/*
+GetTableCCurrent - function downloads current table of currency exchange
+rates and return slice of struct ExchangeTableC (or error), version for
+table C (bid, ask - buy, sell prices)
+*/
 func (t *NBPTable) GetTableCCurrent() ([]ExchangeTableC, error) {
 	var err error
 
@@ -175,10 +218,16 @@ func (t *NBPTable) GetTableCCurrent() ([]ExchangeTableC, error) {
 	return t.ExchangeC, err
 }
 
-// GetPrettyOutput - function returns tables of exchange rates as
-// formatted table, depending on the tableType field: for type A and B tables
-// a column with an average rate is printed, for type C two columns:
-// buy price and sell price
+/*
+GetPrettyOutput - function returns tables of exchange rates as
+formatted table, depending on the tableType field: for type A and B tables
+a column with an average rate is printed, for type C two columns:
+buy price and sell price
+
+Parameters:
+
+	lang - 'en' or 'pl'
+*/
 func (t *NBPTable) GetPrettyOutput(lang string) string {
 	const padding = 3
 	var builder strings.Builder
@@ -232,10 +281,16 @@ func (t *NBPTable) GetPrettyOutput(lang string) string {
 	return output
 }
 
-// GetCSVOutput - function prints tables of exchange rates in the console,
-// in the form of CSV (data separated by a comma), depending on the
-// tableType field: for type A and B tables a column with an average
-// rate is printed, for type C two columns: buy price and sell price
+/*
+GetCSVOutput - function prints tables of exchange rates in the console,
+in the form of CSV (data separated by a comma), depending on the
+tableType field: for type A and B tables a column with an average
+rate is printed, for type C two columns: buy price and sell price
+
+Parameters:
+
+	lang - 'en' or 'pl'
+*/
 func (t *NBPTable) GetCSVOutput(lang string) string {
 	var tableNo string
 	var output string = ""

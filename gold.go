@@ -41,7 +41,22 @@ func NewGold() *NBPGold {
 	return &NBPGold{}
 }
 
-// GoldRaw - function downloads data in json or xml form
+/*
+GoldRaw - function downloads data in json or xml form
+
+Function returns error or nil
+
+Parameters:
+
+    dFlag - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
+	or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
+	(price for today) or 'current' - current gold price (last published)
+
+	lFlag - as an alternative to date, the last <n> prices of gold
+	can be retrieved
+
+	repFormat - 'json' or 'xml'
+*/
 func (g *NBPGold) GoldRaw(dFlag string, lFlag int, repFormat string) error {
 	var err error
 
@@ -54,8 +69,19 @@ func (g *NBPGold) GoldRaw(dFlag string, lFlag int, repFormat string) error {
 	return err
 }
 
-// GoldByDate - function downloads and writes data to goldRates slice,
-// raw data (json) still available in result field
+/*
+GoldByDate - function downloads and writes data to goldRates slice,
+raw data (json) still available in NBPGold.result field
+
+Function returns error or nil
+
+Parameters:
+
+    dFlag - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
+	or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
+	(price for today) or 'current' - current gold price (last published)
+
+*/
 func (g *NBPGold) GoldByDate(dFlag string) error {
 	var err error
 
@@ -73,8 +99,17 @@ func (g *NBPGold) GoldByDate(dFlag string) error {
 	return err
 }
 
-// GoldLast - function downloads and writes data to goldRates slice,
-// raw data (json) still available in result field
+/*
+GoldLast - function downloads and writes data to GoldRates slice,
+raw data (json) still available in NBPGold.result field
+
+Function returns error or nil
+
+Parameters:
+
+	lFlag - as an alternative to date, the last <n> prices of gold
+	can be retrieved
+*/
 func (g *NBPGold) GoldLast(lFlag int) error {
 	var err error
 
@@ -92,7 +127,10 @@ func (g *NBPGold) GoldLast(lFlag int) error {
 	return err
 }
 
-// GetPriceToday - function downloads and returns gold price,
+/*
+GetPriceToday - function downloads and returns today's gold price,
+as GoldRate struct
+*/
 func (g *NBPGold) GetPriceToday() (GoldRate, error) {
 	var err error
 
@@ -110,7 +148,10 @@ func (g *NBPGold) GetPriceToday() (GoldRate, error) {
 	return g.GoldRates[0], err
 }
 
-// GetPriceCurrent - function downloads and returns gold price,
+/*
+GetPriceCurrent - function downloads and returns current gold price as
+GoldRate struct
+*/
 func (g *NBPGold) GetPriceCurrent() (GoldRate, error) {
 	var err error
 
@@ -128,8 +169,16 @@ func (g *NBPGold) GetPriceCurrent() (GoldRate, error) {
 	return g.GoldRates[0], err
 }
 
-// GetPriceByDate - function returns gold prices (as slice od struct),
-// by date ("YYYY-MM-DD") or range of dates ("YYYY-MM-DD:YYYY-MM-DD")
+/*
+GetPriceByDate - function returns gold prices (as slice of struct),
+by date ("YYYY-MM-DD") or range of dates ("YYYY-MM-DD:YYYY-MM-DD")
+
+Parameters:
+
+    date - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
+	or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
+	(price for today) or 'current' - current gold price (last published)
+*/
 func (g *NBPGold) GetPriceByDate(date string) ([]GoldRate, error) {
 	var err error
 
@@ -147,7 +196,13 @@ func (g *NBPGold) GetPriceByDate(date string) ([]GoldRate, error) {
 	return g.GoldRates, err
 }
 
-// GetPrettyOutput - function returns a formatted table of gold prices
+/*
+GetPrettyOutput - function returns a formatted table of gold prices
+
+Parameters:
+
+	lang - 'en' or 'pl'
+*/
 func (g *NBPGold) GetPrettyOutput(lang string) string {
 	const padding = 3
 	var builder strings.Builder
@@ -172,8 +227,14 @@ func (g *NBPGold) GetPrettyOutput(lang string) string {
 	return builder.String()
 }
 
-// GetCSVOutput - function returns prices of gold in CSV format
-// (comma separated data)
+/*
+GetCSVOutput - function returns prices of gold in CSV format
+(comma separated data)
+
+Parameters:
+
+	lang - 'en' or 'pl'
+*/
 func (g *NBPGold) GetCSVOutput(lang string) string {
 	var output string = ""
 
