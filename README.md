@@ -100,11 +100,8 @@ package nbpapi // import "github.com/pjaskulski/nbpapi"
 
 FUNCTIONS
 
-func CheckArg(cmd string, tFlag string, dFlag string, lFlag int, oFlag string, cFlag string) error
-    CheckArg - function verifies the correctness of program call parameters
-
-func SetLang(lang string)
-    SetLang function
+func setLang(lang string)
+    setLang function (language for output functions)
 
 
 TYPES
@@ -157,13 +154,13 @@ func (c *NBPCurrency) CurrencyToday(cFlag string) error
     CurrencyToday - function downloads and writes data to exchange (exchangeC)
     slice, raw data (json) still available in result field
 
-func (c *NBPCurrency) GetCSVOutput() string
+func (c *NBPCurrency) GetCSVOutput(lang string) string
     GetCSVOutput - function returns currency rates, in the form of CSV (data
     separated by a comma), depending on the tableType field: for type A and B
     tables a column with an average rate is printed, for type C two columns: buy
     price and sell price
 
-func (c *NBPCurrency) GetPrettyOutput() string
+func (c *NBPCurrency) GetPrettyOutput(lang string) string
     GetPrettyOutput - function returns exchange rates as formatted table
     depending on the tableType field: for type A and B tables a column with an
     average rate is printed, for type C two columns: buy price and sell price
@@ -192,11 +189,11 @@ type NBPGold struct {
 func NewGold() *NBPGold
     NewGold - function creates new gold type
 
-func (g *NBPGold) GetCSVOutput() string
+func (g *NBPGold) GetCSVOutput(lang string) string
     GetCSVOutput - function returns prices of gold in CSV format (comma
     separated data)
 
-func (g *NBPGold) GetPrettyOutput() string
+func (g *NBPGold) GetPrettyOutput(lang string) string
     GetPrettyOutput - function returns a formatted table of gold prices
 
 func (g *NBPGold) GetPriceByDate(date string) ([]GoldRate, error)
@@ -233,13 +230,13 @@ type NBPTable struct {
 func NewTable(tFlag string) *NBPTable
     NewTable - function creates new table type
 
-func (t *NBPTable) GetCSVOutput() string
+func (t *NBPTable) GetCSVOutput(lang string) string
     GetCSVOutput - function prints tables of exchange rates in the console, in
     the form of CSV (data separated by a comma), depending on the tableType
     field: for type A and B tables a column with an average rate is printed, for
     type C two columns: buy price and sell price
 
-func (t *NBPTable) GetPrettyOutput() string
+func (t *NBPTable) GetPrettyOutput(lang string) string
     GetPrettyOutput - function returns tables of exchange rates as formatted
     table, depending on the tableType field: for type A and B tables a column
     with an average rate is printed, for type C two columns: buy price and sell
