@@ -13,10 +13,10 @@ func TestGetGoldCurrent(t *testing.T) {
 	address := queryGoldCurrent()
 	result, err := getData(address, "json")
 	if err != nil {
-		t.Errorf("oczekiwano err == nil, otrzymano err != nil")
+		t.Errorf("expected: err == nil, received: err != nil")
 	}
 	if !json.Valid(result) {
-		t.Errorf("otrzymano niepoprawną zawartość json")
+		t.Errorf("incorrect json content was received")
 	}
 }
 
@@ -32,7 +32,7 @@ func TestGetGoldToday(t *testing.T) {
 		address = queryGoldToday()
 		_, err := getData(address, "json")
 		if err != nil {
-			t.Errorf("oczekiwano err == nil, otrzymano err != nil")
+			t.Errorf("expected: err == nil, received: err != nil")
 		}
 	}
 }
@@ -45,10 +45,10 @@ func TestGetGoldDay(t *testing.T) {
 	address := queryGoldDay(day)
 	result, err := getData(address, "json")
 	if err != nil {
-		t.Errorf("oczekiwano err == nil, otrzymano err != nil")
+		t.Errorf("expected: err == nil, received: err != nil")
 	}
 	if !json.Valid(result) {
-		t.Errorf("otrzymano niepoprawną zawartość json")
+		t.Errorf("incorrect json content was received")
 	}
 
 	var nbpGold []GoldRate
@@ -58,10 +58,10 @@ func TestGetGoldDay(t *testing.T) {
 	}
 
 	if nbpGold[0].Data != day {
-		t.Errorf("niepoprawna data, oczekiwano %s, otrzymano %s", day, nbpGold[0].Data)
+		t.Errorf("invalid date, %s expected, %s received", day, nbpGold[0].Data)
 	}
 	if nbpGold[0].Price != cena {
-		t.Errorf("niepoprawny cena, oczekiwano %.4f, otrzymano %.4f", cena, nbpGold[0].Price)
+		t.Errorf("invalid price, expected %.4f, received %.4f", cena, nbpGold[0].Price)
 	}
 }
 
@@ -72,7 +72,7 @@ func TestGetGoldDayFailed(t *testing.T) {
 	address := queryGoldDay(day)
 	_, err := getData(address, "json")
 	if err == nil {
-		t.Errorf("oczekiwano err != nil, otrzymano err == nil")
+		t.Errorf("expected: err != nil, received: err == nil")
 	}
 }
 
@@ -83,10 +83,10 @@ func TestGetGoldLast(t *testing.T) {
 	address := queryGoldLast(strconv.Itoa(lastNo))
 	result, err := getData(address, "json")
 	if err != nil {
-		t.Errorf("oczekiwano err == nil, otrzymano err != nil")
+		t.Errorf("expected: err == nil, received: err != nil")
 	}
 	if !json.Valid(result) {
-		t.Errorf("otrzymano niepoprawną zawartość json")
+		t.Errorf("incorrect json content was received")
 	}
 
 	var nbpGold []GoldRate
@@ -96,7 +96,7 @@ func TestGetGoldLast(t *testing.T) {
 	}
 
 	if len(nbpGold) != lastNo {
-		t.Errorf("oczekiwano %d tabel kursów, otrzymano %d", lastNo, len(nbpGold))
+		t.Errorf("expected: %d exchange rate tables, received: %d", lastNo, len(nbpGold))
 	}
 }
 
@@ -107,10 +107,10 @@ func TestGetGoldRange(t *testing.T) {
 	address := queryGoldRange(day)
 	result, err := getData(address, "json")
 	if err != nil {
-		t.Errorf("oczekiwano err == nil, otrzymano err != nil")
+		t.Errorf("expected: err == nil, received: err != nil")
 	}
 	if !json.Valid(result) {
-		t.Errorf("otrzymano niepoprawną zawartość json")
+		t.Errorf("incorrect json content was received")
 	}
 
 	var nbpGold []GoldRate
@@ -120,14 +120,14 @@ func TestGetGoldRange(t *testing.T) {
 	}
 
 	if len(nbpGold) != 2 {
-		t.Errorf("oczekiwano cen złota z 2 notowań, otrzymano z %d", len(nbpGold))
+		t.Errorf("gold prices were expected from 2 quotes, obtained from %d", len(nbpGold))
 	}
 
 	if nbpGold[0].Data != day[0:10] {
-		t.Errorf("niepoprawna data, oczekiwano %s, otrzymano %s", day[0:10], nbpGold[0].Data)
+		t.Errorf("invalid date, %s expected, %s received", day[0:10], nbpGold[0].Data)
 	}
 
 	if nbpGold[1].Data != day[11:] {
-		t.Errorf("niepoprawna data, oczekiwano %s, otrzymano %s", day[11:], nbpGold[1].Data)
+		t.Errorf("invalid date, %s expected, %s received", day[11:], nbpGold[1].Data)
 	}
 }

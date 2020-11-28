@@ -14,10 +14,10 @@ func TestGetTableCurrent(t *testing.T) {
 	address := queryTableCurrent(table)
 	result, err := getData(address, "json")
 	if err != nil {
-		t.Errorf("oczekiwano err == nil, otrzymano err != nil")
+		t.Errorf("expected: err == nil, received: err != nil")
 	}
 	if !json.Valid(result) {
-		t.Errorf("otrzymano niepoprawną zawartość json")
+		t.Errorf("incorrect json content was received")
 	}
 }
 
@@ -30,10 +30,10 @@ func TestGetTableDay(t *testing.T) {
 	address := queryTableDay(table, day)
 	result, err := getData(address, "json")
 	if err != nil {
-		t.Errorf("oczekiwano err == nil, otrzymano err != nil")
+		t.Errorf("expected: err == nil, received: err != nil")
 	}
 	if !json.Valid(result) {
-		t.Errorf("otrzymano niepoprawną zawartość json")
+		t.Errorf("incorrect json content was received")
 	}
 
 	var nbpTables []ExchangeTable
@@ -43,13 +43,13 @@ func TestGetTableDay(t *testing.T) {
 	}
 
 	if nbpTables[0].Table != table {
-		t.Errorf("niepoprawny typ tabeli, oczekiwano %s, otrzymano %s", table, nbpTables[0].Table)
+		t.Errorf("invalid table type, expected: %s, received: %s", table, nbpTables[0].Table)
 	}
 	if nbpTables[0].No != tableNo {
-		t.Errorf("niepoprawny numer tabeli, oczekiwano %s, otrzymano %s", tableNo, nbpTables[0].No)
+		t.Errorf("invalid table number, expected: %s, received: %s", tableNo, nbpTables[0].No)
 	}
 	if nbpTables[0].EffectiveDate != day {
-		t.Errorf("niepoprawna data publikacji, oczekiwano %s, otrzymano %s", day, nbpTables[0].EffectiveDate)
+		t.Errorf("invalid publication date, expected: %s, received: %s", day, nbpTables[0].EffectiveDate)
 	}
 }
 
@@ -61,10 +61,10 @@ func TestGetTableRange(t *testing.T) {
 	address := queryTableRange(table, day)
 	result, err := getData(address, "json")
 	if err != nil {
-		t.Errorf("oczekiwano err == nil, otrzymano err != nil")
+		t.Errorf("expected: err == nil, received: err != nil")
 	}
 	if !json.Valid(result) {
-		t.Errorf("otrzymano niepoprawną zawartość json")
+		t.Errorf("incorrect json content was received")
 	}
 
 	var nbpTables []ExchangeTable
@@ -74,15 +74,15 @@ func TestGetTableRange(t *testing.T) {
 	}
 
 	if len(nbpTables) != 2 {
-		t.Errorf("oczekiwano 2 tabel kursów, otrzymano %d", len(nbpTables))
+		t.Errorf("2 exchange rate tables were expected, received: %d", len(nbpTables))
 	}
 
 	if nbpTables[0].Table != table {
-		t.Errorf("niepoprawny typ tabeli, oczekiwano %s, otrzymano %s", table, nbpTables[0].Table)
+		t.Errorf("invalid table type, expected: %s, received: %s", table, nbpTables[0].Table)
 	}
 
 	if nbpTables[1].Table != table {
-		t.Errorf("niepoprawny typ tabeli, oczekiwano %s, otrzymano %s", table, nbpTables[1].Table)
+		t.Errorf("invalid table type, expected: %s, received: %s", table, nbpTables[1].Table)
 	}
 }
 
@@ -94,10 +94,10 @@ func TestGetTableLast(t *testing.T) {
 	address := queryTableLast(table, lastNo)
 	result, err := getData(address, "json")
 	if err != nil {
-		t.Errorf("oczekiwano err == nil, otrzymano err != nil")
+		t.Errorf("expected: err == nil, received: err != nil")
 	}
 	if !json.Valid(result) {
-		t.Errorf("otrzymano niepoprawną zawartość json")
+		t.Errorf("incorrect json content was received")
 	}
 
 	var nbpTables []ExchangeTable
@@ -107,7 +107,7 @@ func TestGetTableLast(t *testing.T) {
 	}
 
 	if len(nbpTables) != 5 {
-		t.Errorf("oczekiwano 5 tabel kursów, otrzymano %d", len(nbpTables))
+		t.Errorf("5 exchange rate tables were expected, received: %d", len(nbpTables))
 	}
 }
 
@@ -124,7 +124,7 @@ func TestGetTableToday(t *testing.T) {
 		address = queryTableToday(table)
 		_, err := getData(address, "json")
 		if err != nil {
-			t.Errorf("oczekiwano err == nil, otrzymano err != nil")
+			t.Errorf("expected: err == nil, received: err != nil")
 		}
 	}
 }
@@ -136,6 +136,6 @@ func TestGetTableTodayFailed(t *testing.T) {
 	address := queryTableToday(table)
 	_, err := getData(address, "json")
 	if err == nil {
-		t.Errorf("oczekiwano err != nil, otrzymano err != nil")
+		t.Errorf("expected: err != nil, received: err != nil")
 	}
 }

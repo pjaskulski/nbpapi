@@ -16,10 +16,10 @@ func TestGetCurrencyCurrent(t *testing.T) {
 	address := queryCurrencyCurrent(table, currency)
 	result, err := getData(address, "json")
 	if err != nil {
-		t.Errorf("oczekiwano err == nil, otrzymano err != nil")
+		t.Errorf("expected: err == nil, received: err != nil")
 	}
 	if !strings.Contains(string(result), "\"table\":\"A\",\"currency\":\"frank szwajcarski\"") {
-		t.Errorf("otrzymano niepoprawną zawartość json")
+		t.Errorf("incorrect json content was received")
 	}
 }
 
@@ -31,24 +31,24 @@ func TestGetCurrencyCurrentXXX(t *testing.T) {
 	address := queryCurrencyCurrent(table, currency)
 	_, err := getData(address, "json")
 	if err == nil {
-		t.Errorf("oczekiwano err != nil, otrzymano err == nil")
+		t.Errorf("expected: err != nil, received: err == nil")
 	}
 }
 
 func TestGetCurrencyDay(t *testing.T) {
 	var table string = "A"
 	var currency string = "CHF"
-	var day string = "2020-11-13" // Friday - ok, kurs CHF = 4.1605
+	var day string = "2020-11-13" // Friday 13 Nov 2020, CHF = 4.1605
 
 	littleDelay()
 	address := queryCurrencyDay(table, day, currency)
 	result, err := getData(address, "json")
 	if err != nil {
-		t.Errorf("oczekiwano err == nil, otrzymano err != nil")
+		t.Errorf("expected: err == nil, received: err != nil")
 	}
 	// mało eleganckie ale skuteczne
 	if !strings.Contains(string(result), "\"effectiveDate\":\"2020-11-13\",\"mid\":4.1605") {
-		t.Errorf("niepoprawna zawartość json, kurs CHF 13.11.2020 wynosił 4.1605")
+		t.Errorf("incorrect json content was received, the CHF exchange rate on November 13, 2020 was 4.1605")
 	}
 }
 
@@ -61,7 +61,7 @@ func TestGetCurrencyDaySaturday(t *testing.T) {
 	address := queryCurrencyDay(table, day, currency)
 	_, err := getData(address, "json")
 	if err == nil {
-		t.Errorf("oczekiwano err != nil, otrzymano err == nil")
+		t.Errorf("expected: err != nil, received: err == nil")
 	}
 }
 
@@ -74,7 +74,7 @@ func TestGetCurrencyLast(t *testing.T) {
 	address := queryCurrencyLast(table, last, currency)
 	_, err := getData(address, "json")
 	if err != nil {
-		t.Errorf("oczekiwano err == nil, otrzymano err != nil")
+		t.Errorf("expected: err == nil, received: err != nil")
 	}
 }
 
@@ -87,7 +87,7 @@ func TestGetCurrencyLastFailed(t *testing.T) {
 	address := queryCurrencyLast(table, last, currency)
 	_, err := getData(address, "json")
 	if err == nil {
-		t.Errorf("oczekiwano err != nil, otrzymano err == nil")
+		t.Errorf("expected: err != nil, received: err == nil")
 	}
 }
 
@@ -100,7 +100,7 @@ func TestGetCurrencyRange(t *testing.T) {
 	address := queryCurrencyRange(table, day, currency)
 	result, err := getData(address, "json")
 	if err != nil {
-		t.Errorf("oczekiwano err == nil, otrzymano err != nil")
+		t.Errorf("expected: err == nil, received: err != nil")
 	}
 
 	var nbpCurrency exchangeCurrency
@@ -110,7 +110,7 @@ func TestGetCurrencyRange(t *testing.T) {
 	}
 	var ratesCount int = len(nbpCurrency.Rates)
 	if ratesCount != 2 {
-		t.Errorf("oczekiwana liczba kursów == 2, otrzymano %d", ratesCount)
+		t.Errorf("expected number of exchange rates == 2, obtained %d", ratesCount)
 	}
 }
 
@@ -123,7 +123,7 @@ func TestGetCurrencyRangeFailed(t *testing.T) {
 	address := queryCurrencyRange(table, day, currency)
 	_, err := getData(address, "json")
 	if err == nil {
-		t.Errorf("oczekiwano err != nil, otrzymano err == nil")
+		t.Errorf("expected: err != nil, received: err == nil")
 	}
 }
 
@@ -141,7 +141,7 @@ func TestGetCurrencyToday(t *testing.T) {
 		address = queryCurrencyToday(table, currency)
 		_, err := getData(address, "json")
 		if err != nil {
-			t.Errorf("oczekiwano err == nil, otrzymano err != nil")
+			t.Errorf("expected: err == nil, received: err != nil")
 		}
 	}
 }
