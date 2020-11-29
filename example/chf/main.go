@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/pjaskulski/nbpapi"
 )
@@ -17,10 +18,11 @@ func main() {
 	err := nbpMid.CurrencyLast("CHF", 5)
 	if err != nil {
 		fmt.Println(err)
+	} else {
+		// print polish version
+		fmt.Println(nbpMid.GetPrettyOutput("pl"))
+		fmt.Println()
 	}
-
-	// print polish version
-	fmt.Println(nbpMid.GetPrettyOutput("pl"))
 	fmt.Println()
 
 	/*
@@ -33,7 +35,8 @@ func main() {
 	nbpC := nbpapi.NewCurrency("C")
 	err = nbpC.CurrencyToday("CHF")
 	if err != nil {
-		fmt.Println("Currently, there is no todays CHF exchange rate")
+		todayDate := time.Now().Format("2006/01/02")
+		fmt.Printf("Today's (%s) exchange rate could not be downloaded\n", todayDate)
 	} else {
 		fmt.Println("Table No: ", nbpC.ExchangeC.Rates[0].No)
 		fmt.Println("Date: ", nbpC.ExchangeC.Rates[0].EffectiveDate)
@@ -51,7 +54,8 @@ func main() {
 	var today nbpapi.Rate
 	today, err = nbpC.GetRateToday("CHF")
 	if err != nil {
-		fmt.Println("Currently, there is no todays CHF exchange rate")
+		todayDate := time.Now().Format("2006/01/02")
+		fmt.Printf("Today's (%s) exchange rate could not be downloaded\n", todayDate)
 	} else {
 		fmt.Println("Table No: ", today.No)
 		fmt.Println("Date: ", today.EffectiveDate)
