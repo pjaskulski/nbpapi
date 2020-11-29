@@ -9,11 +9,13 @@ import (
 )
 
 func main() {
-	// How to get table A of currency exchange rates published
-	// on 12 Nov 2020: function TableByDate("2020-11-12") fetch data, then
-	// one can get data from nbpTable.Exchange structures (or
-	// nbpTable.ExchangeC structures, depending of the type of
-	// table of exchange rates)
+	/*
+		How to get table A of currency exchange rates published
+		on 12 Nov 2020: function TableByDate("2020-11-12") fetch data.
+		The data can be read from nbpTable.Exchange structures (or
+		nbpTable.ExchangeC structures, depending of the type of
+		table of exchange rates)
+	*/
 	var err error
 	var tableNo string
 
@@ -45,27 +47,31 @@ func main() {
 	}
 	fmt.Println()
 
-	// how to get a latest 5 exchange rates of currency CHF,
-	// table of type A (mid - average exchange rate), as CSV data
+	/*
+		How to get a latest 5 exchange rates of currency CHF,
+		table of type A (mid - average exchange rate), as CSV data
+	*/
 	nbpMid := nbpapi.NewCurrency("A")
 	err = nbpMid.CurrencyLast("CHF", 5)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	// english version
+	// print as CSV, english version
 	fmt.Println(nbpMid.GetCSVOutput("en"))
 	fmt.Println()
 
-	// polish version
+	// print as CSV, polish version
 	fmt.Println(nbpMid.GetCSVOutput("pl"))
 	fmt.Println()
 
-	// how to get today's rate of CHF, table C (bid, ask - buy and sell
-	// exchange rate), function GetCurencyToday, returns error or nil and
-	// populates slice ExchangeC, the currency rate is taken from the first
-	// element of the ExchangeC, later an example of a more convenient
-	// function: GetRateToday that returns a struct.
+	/*
+		How to get today's rate of CHF, table C (bid, ask - buy and sell
+		exchange rate): function GetCurencyToday, returns error or nil and
+		populates slice ExchangeC, the currency rate is taken from the first
+		element of the ExchangeC, later an example of a more convenient
+		function: GetRateToday that returns a struct.
+	*/
 	nbpC := nbpapi.NewCurrency("C")
 	err = nbpC.CurrencyToday("CHF")
 	if err != nil {
@@ -78,10 +84,12 @@ func main() {
 	}
 	fmt.Println()
 
-	// alternatively how to get today's rate of CHF, table C (bid, ask -
-	// buy and sell exchange rates): function GetRateToday return Rate
-	// struct or error, the ExchangeC slice is also populated, but reading
-	// the data from the Rate structure is more convenient
+	/*
+		Alternatively how to get today's rate of CHF, table C (bid, ask -
+		buy and sell exchange rates): function GetRateToday return Rate
+		struct or error, the ExchangeC slice is also populated, but reading
+		the data from the Rate structure is more convenient
+	*/
 	var today nbpapi.Rate
 	today, err = nbpC.GetRateToday("CHF")
 	if err != nil {
@@ -94,10 +102,12 @@ func main() {
 	}
 	fmt.Println()
 
-	// how to get current rate of CHF, table C (bid, ask - buy and sell
-	// exchange rate): function GetRateCurrent return Rate struct or error,
-	// the ExchangeC table is also populated, but reading the data from the
-	// Rate structure is more convenient
+	/*
+		How to get current rate of CHF, table C (bid, ask - buy and sell
+		exchange rate): function GetRateCurrent return Rate struct or error,
+		the ExchangeC table is also populated, but reading the data from the
+		Rate structure is more convenient
+	*/
 	var result nbpapi.Rate
 	result, err = nbpC.GetRateCurrent("CHF")
 	if err != nil {
@@ -110,8 +120,10 @@ func main() {
 	}
 	fmt.Println()
 
-	// currency exchange rate for date or range of dates:
-	// function GetRateByDate return slice of Rate struct or error
+	/*
+		Currency exchange rate for date or range of dates:
+		function GetRateByDate return slice of Rate struct or error
+	*/
 	var results []nbpapi.Rate
 	results, err = nbpC.GetRateByDate("CHF", "2020-11-12")
 	if err != nil {
@@ -146,9 +158,11 @@ func main() {
 	}
 	fmt.Println()
 
-	// gold price on November 12, 2020: function GetPriceByDate returns
-	// slice of GoldPrice struct, in case of date it is always 1 element,
-	// in case of range of date is more
+	/*
+		Gold price on November 12, 2020: function GetPriceByDate returns
+		slice of GoldPrice struct, in case of date it is always 1 element,
+		in case of range of date is more
+	*/
 	var prices []nbpapi.GoldRate
 	prices, err = gold.GetPriceByDate("2020-11-12")
 	if err != nil {
@@ -161,8 +175,10 @@ func main() {
 	}
 	fmt.Println()
 
-	// gold prices between November 12, 2020 and November 19, 2020:
-	// function GetPriceByDate return slice of GoldPrice struct
+	/*
+		Gold prices between November 12, 2020 and November 19, 2020:
+		function GetPriceByDate return slice of GoldPrice struct
+	*/
 	prices, err = gold.GetPriceByDate("2020-11-12:2020-11-19")
 	if err != nil {
 		fmt.Println(err)

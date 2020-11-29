@@ -79,13 +79,13 @@ Function returns error or nil
 Parameters:
 
     dFlag - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
-	or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
-	(rate for today) or 'current' - current table / rate (last published)
+    or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
+    (rate for today) or 'current' - current table / rate (last published)
 
-	lFlag - as an alternative to date, the last <n> tables/rates
-	can be retrieved
+    lFlag - as an alternative to date, the last <n> tables/rates
+    can be retrieved
 
-	repFormat - 'json' or 'xml'
+    repFormat - 'json' or 'xml'
 */
 func (t *NBPTable) TableRaw(dFlag string, lFlag int, repFormat string) error {
 	var err error
@@ -108,9 +108,9 @@ Function returns error or nil
 
 Parameters:
 
-	dFlag - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
-	or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
-	(rate for today) or 'current' - current table / rate (last published)
+    dFlag - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
+    or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
+    (rate for today) or 'current' - current table / rate (last published)
 */
 func (t *NBPTable) TableByDate(dFlag string) error {
 	var err error
@@ -142,7 +142,7 @@ Function returns error or nil
 
 Parameters:
 
-	lFlag - the last <n> tables/rates can be retrieved
+    lFlag - the last <n> tables/rates can be retrieved
 
 */
 func (t *NBPTable) TableLast(lFlag int) error {
@@ -226,7 +226,7 @@ buy price and sell price
 
 Parameters:
 
-	lang - 'en' or 'pl'
+    lang - 'en' or 'pl'
 */
 func (t *NBPTable) GetPrettyOutput(lang string) string {
 	const padding = 3
@@ -289,7 +289,7 @@ rate is printed, for type C two columns: buy price and sell price
 
 Parameters:
 
-	lang - 'en' or 'pl'
+    lang - 'en' or 'pl'
 */
 func (t *NBPTable) GetCSVOutput(lang string) string {
 	var tableNo string

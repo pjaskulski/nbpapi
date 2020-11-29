@@ -49,13 +49,13 @@ Function returns error or nil
 Parameters:
 
     dFlag - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
-	or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
-	(price for today) or 'current' - current gold price (last published)
+    or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
+    (price for today) or 'current' - current gold price (last published)
 
-	lFlag - as an alternative to date, the last <n> prices of gold
-	can be retrieved
+    lFlag - as an alternative to date, the last <n> prices of gold
+    can be retrieved
 
-	repFormat - 'json' or 'xml'
+    repFormat - 'json' or 'xml'
 */
 func (g *NBPGold) GoldRaw(dFlag string, lFlag int, repFormat string) error {
 	var err error
@@ -78,8 +78,8 @@ Function returns error or nil
 Parameters:
 
     dFlag - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
-	or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
-	(price for today) or 'current' - current gold price (last published)
+    or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
+    (price for today) or 'current' - current gold price (last published)
 
 */
 func (g *NBPGold) GoldByDate(dFlag string) error {
@@ -107,8 +107,8 @@ Function returns error or nil
 
 Parameters:
 
-	lFlag - as an alternative to date, the last <n> prices of gold
-	can be retrieved
+    lFlag - as an alternative to date, the last <n> prices of gold
+    can be retrieved
 */
 func (g *NBPGold) GoldLast(lFlag int) error {
 	var err error
@@ -176,8 +176,8 @@ by date ("YYYY-MM-DD") or range of dates ("YYYY-MM-DD:YYYY-MM-DD")
 Parameters:
 
     date - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
-	or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
-	(price for today) or 'current' - current gold price (last published)
+    or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
+    (price for today) or 'current' - current gold price (last published)
 */
 func (g *NBPGold) GetPriceByDate(date string) ([]GoldRate, error) {
 	var err error
@@ -201,7 +201,7 @@ GetPrettyOutput - function returns a formatted table of gold prices
 
 Parameters:
 
-	lang - 'en' or 'pl'
+    lang - 'en' or 'pl'
 */
 func (g *NBPGold) GetPrettyOutput(lang string) string {
 	const padding = 3
@@ -233,7 +233,7 @@ GetCSVOutput - function returns prices of gold in CSV format
 
 Parameters:
 
-	lang - 'en' or 'pl'
+    lang - 'en' or 'pl'
 */
 func (g *NBPGold) GetCSVOutput(lang string) string {
 	var output string = ""
