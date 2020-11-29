@@ -1,5 +1,5 @@
 run:
-	go run ./example/main.go
+	go run ./example/table/main.go
 
 test:
 	go test -v .
