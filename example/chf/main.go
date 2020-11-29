@@ -11,7 +11,7 @@ import (
 func main() {
 	/*
 		How to get a latest 5 exchange rates of currency CHF,
-		table of type A (mid - average exchange rate), as CSV data
+		table of type A (mid - average exchange rate)
 	*/
 	nbpMid := nbpapi.NewCurrency("A")
 	err := nbpMid.CurrencyLast("CHF", 5)
