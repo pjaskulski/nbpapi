@@ -27,7 +27,7 @@ func TestGetTableDay(t *testing.T) {
 	var tableNo string = "224/A/NBP/2020"
 
 	littleDelay()
-	address := queryTableDay(table, day)
+	address := queryTableDate(table, day)
 	result, err := getData(address, "json")
 	if err != nil {
 		t.Errorf("expected: err == nil, received: err != nil")
@@ -118,7 +118,7 @@ func TestGetTableToday(t *testing.T) {
 	var day string = today.Format("2006-01-02")
 
 	littleDelay()
-	address = queryTableDay(table, day)
+	address = queryTableDate(table, day)
 	_, err := getData(address, "json")
 	if err == nil {
 		address = queryTableToday(table)

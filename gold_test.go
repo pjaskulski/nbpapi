@@ -26,7 +26,7 @@ func TestGetGoldToday(t *testing.T) {
 	var day string = today.Format("2006-01-02")
 
 	littleDelay()
-	address = queryGoldDay(day)
+	address = queryGoldDate(day)
 	_, err := getData(address, "json")
 	if err == nil {
 		address = queryGoldToday()
@@ -42,7 +42,7 @@ func TestGetGoldDay(t *testing.T) {
 	var cena float64 = 229.03
 
 	littleDelay()
-	address := queryGoldDay(day)
+	address := queryGoldDate(day)
 	result, err := getData(address, "json")
 	if err != nil {
 		t.Errorf("expected: err == nil, received: err != nil")
@@ -69,7 +69,7 @@ func TestGetGoldDayFailed(t *testing.T) {
 	var day string = "2020-11-15" // brak notowań w tym dniu
 
 	littleDelay()
-	address := queryGoldDay(day)
+	address := queryGoldDate(day)
 	_, err := getData(address, "json")
 	if err == nil {
 		t.Errorf("expected: err != nil, received: err == nil")

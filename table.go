@@ -64,9 +64,9 @@ type ExchangeTableC struct {
 // Public func
 
 // NewTable - function creates new table type
-func NewTable(tFlag string) *NBPTable {
+func NewTable(tableType string) *NBPTable {
 	return &NBPTable{
-		tableType: tFlag,
+		tableType: tableType,
 	}
 }
 
@@ -78,20 +78,20 @@ Function returns error or nil
 
 Parameters:
 
-    dFlag - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
+    date - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
     or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
     (rate for today) or 'current' - current table / rate (last published)
 
-    lFlag - as an alternative to date, the last <n> tables/rates
+    last - as an alternative to date, the last <n> tables/rates
     can be retrieved
 
-    repFormat - 'json' or 'xml'
+    format - 'json' or 'xml'
 */
-func (t *NBPTable) TableRaw(dFlag string, lFlag int, repFormat string) error {
+func (t *NBPTable) TableRaw(date string, last int, format string) error {
 	var err error
 
-	address := getTableAddress(t.tableType, dFlag, lFlag)
-	t.result, err = getData(address, repFormat)
+	address := getTableAddress(t.tableType, date, last)
+	t.result, err = getData(address, format)
 	if err != nil {
 		return err
 	}
@@ -108,14 +108,14 @@ Function returns error or nil
 
 Parameters:
 
-    dFlag - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
+    date - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
     or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
     (rate for today) or 'current' - current table / rate (last published)
 */
-func (t *NBPTable) TableByDate(dFlag string) error {
+func (t *NBPTable) TableByDate(date string) error {
 	var err error
 
-	address := getTableAddress(t.tableType, dFlag, 0)
+	address := getTableAddress(t.tableType, date, 0)
 	t.result, err = getData(address, "json")
 	if err != nil {
 		return err
@@ -142,13 +142,13 @@ Function returns error or nil
 
 Parameters:
 
-    lFlag - the last <n> tables/rates can be retrieved
+    last - the last <n> tables/rates can be retrieved
 
 */
-func (t *NBPTable) TableLast(lFlag int) error {
+func (t *NBPTable) TableLast(last int) error {
 	var err error
 
-	address := getTableAddress(t.tableType, "", lFlag)
+	address := getTableAddress(t.tableType, "", last)
 	t.result, err = getData(address, "json")
 	if err != nil {
 		return err
@@ -333,19 +333,19 @@ func (t *NBPTable) GetRawOutput() string {
 
 // getTableAddress - build download address depending on previously
 // verified input parameters (--table, --date or --last)
-func getTableAddress(tableType string, dFlag string, lFlag int) string {
+func getTableAddress(tableType string, date string, last int) string {
 	var address string
 
-	if lFlag != 0 {
-		address = queryTableLast(tableType, strconv.Itoa(lFlag))
-	} else if dFlag == "today" {
+	if last != 0 {
+		address = queryTableLast(tableType, strconv.Itoa(last))
+	} else if date == "today" {
 		address = queryTableToday(tableType)
-	} else if dFlag == "current" {
+	} else if date == "current" {
 		address = queryTableCurrent(tableType)
-	} else if len(dFlag) == 10 {
-		address = queryTableDay(tableType, dFlag)
-	} else if len(dFlag) == 21 {
-		address = queryTableRange(tableType, dFlag)
+	} else if len(date) == 10 {
+		address = queryTableDate(tableType, date)
+	} else if len(date) == 21 {
+		address = queryTableRange(tableType, date)
 	}
 
 	return address
@@ -364,17 +364,17 @@ func queryTableCurrent(tableType string) string {
 
 // queryTableDay - returns query: table of exchange rates
 // on the given date (YYYY-MM-DD)
-func queryTableDay(tableType string, day string) string {
-	return fmt.Sprintf("%s/tables/%s/%s/", baseAddressTable, tableType, day)
+func queryTableDate(tableType string, date string) string {
+	return fmt.Sprintf("%s/tables/%s/%s/", baseAddressTable, tableType, date)
 }
 
 // queryTableRange - returns query: table of exchange rates  within
 // the given date range (RRRR-MM-DD:RRRR-MM-DD)
-func queryTableRange(tableType string, day string) string {
+func queryTableRange(tableType string, date string) string {
 	var startDate string
 	var stopDate string
 
-	temp := strings.Split(day, ":")
+	temp := strings.Split(date, ":")
 	startDate = temp[0]
 	stopDate = temp[1]
 

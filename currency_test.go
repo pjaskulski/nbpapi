@@ -41,7 +41,7 @@ func TestGetCurrencyDay(t *testing.T) {
 	var day string = "2020-11-13" // Friday 13 Nov 2020, CHF = 4.1605
 
 	littleDelay()
-	address := queryCurrencyDay(table, day, currency)
+	address := queryCurrencyDate(table, day, currency)
 	result, err := getData(address, "json")
 	if err != nil {
 		t.Errorf("expected: err == nil, received: err != nil")
@@ -58,7 +58,7 @@ func TestGetCurrencyDaySaturday(t *testing.T) {
 	var day string = "2020-11-14" // Saturday - no table of exchange rates
 
 	littleDelay()
-	address := queryCurrencyDay(table, day, currency)
+	address := queryCurrencyDate(table, day, currency)
 	_, err := getData(address, "json")
 	if err == nil {
 		t.Errorf("expected: err != nil, received: err == nil")
@@ -135,7 +135,7 @@ func TestGetCurrencyToday(t *testing.T) {
 	var day string = today.Format("2006-01-02")
 
 	littleDelay()
-	address = queryCurrencyDay(table, day, currency)
+	address = queryCurrencyDate(table, day, currency)
 	_, err := getData(address, "json")
 	if err == nil {
 		address = queryCurrencyToday(table, currency)

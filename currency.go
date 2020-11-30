@@ -67,9 +67,9 @@ type Rate struct {
 }
 
 // NewCurrency - function creates new currency type
-func NewCurrency(tFlag string) *NBPCurrency {
+func NewCurrency(tableType string) *NBPCurrency {
 	return &NBPCurrency{
-		tableType: tFlag,
+		tableType: tableType,
 	}
 }
 
@@ -82,23 +82,23 @@ Function returns error or nil
 
 Parameters:
 
-    dFlag - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
+    date - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
     or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
     (rate for today) or 'current' - current table / rate (last published)
 
-    lFlag - as an alternative to date, the last <n> tables/rates
+    last - as an alternative to date, the last <n> tables/rates
     can be retrieved
 
-    cFlag - ISO 4217 currency code, depending on the type of the
+    code - ISO 4217 currency code, depending on the type of the
     table available currencies may vary
 
-    repFormat - 'json' or 'xml'
+    format - 'json' or 'xml'
 */
-func (c *NBPCurrency) CurrencyRaw(dFlag string, lFlag int, cFlag string, repFormat string) error {
+func (c *NBPCurrency) CurrencyRaw(date string, last int, code string, format string) error {
 	var err error
 
-	address := getCurrencyAddress(c.tableType, dFlag, lFlag, cFlag)
-	c.result, err = getData(address, repFormat)
+	address := getCurrencyAddress(c.tableType, date, last, code)
+	c.result, err = getData(address, format)
 	if err != nil {
 		return err
 	}
@@ -114,17 +114,17 @@ Function returns error or nil
 
 Parameters:
 
-    dFlag - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
+    date - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
     or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
     (rate for today) or 'current' - current table / rate (last published)
 
-    cFlag - ISO 4217 currency code, depending on the type of the
+    code - ISO 4217 currency code, depending on the type of the
     table available currencies may vary
 */
-func (c *NBPCurrency) CurrencyByDate(dFlag string, cFlag string) error {
+func (c *NBPCurrency) CurrencyByDate(date string, code string) error {
 	var err error
 
-	address := getCurrencyAddress(c.tableType, dFlag, 0, cFlag)
+	address := getCurrencyAddress(c.tableType, date, 0, code)
 	c.result, err = getData(address, "json")
 	if err != nil {
 		return err
@@ -150,16 +150,16 @@ Function returns error or nil
 
 Parameters:
 
-    cFlag - ISO 4217 currency code, depending on the type of the
+    code - ISO 4217 currency code, depending on the type of the
     table available currencies may vary
 
-    lFlag - as an alternative to date, the last <n> tables/rates
+    last - as an alternative to date, the last <n> tables/rates
     can be retrieved
 */
-func (c *NBPCurrency) CurrencyLast(cFlag string, lFlag int) error {
+func (c *NBPCurrency) CurrencyLast(code string, last int) error {
 	var err error
 
-	address := getCurrencyAddress(c.tableType, "", lFlag, cFlag)
+	address := getCurrencyAddress(c.tableType, "", last, code)
 	c.result, err = getData(address, "json")
 	if err != nil {
 		return err
@@ -185,13 +185,13 @@ Function returns error or nil
 
 Parameters:
 
-    cFlag - ISO 4217 currency code, depending on the type of the
+    code - ISO 4217 currency code, depending on the type of the
     table available currencies may vary
 */
-func (c *NBPCurrency) CurrencyToday(cFlag string) error {
+func (c *NBPCurrency) CurrencyToday(code string) error {
 	var err error
 
-	address := getCurrencyAddress(c.tableType, "today", 0, cFlag)
+	address := getCurrencyAddress(c.tableType, "today", 0, code)
 	c.result, err = getData(address, "json")
 	if err != nil {
 		return err
@@ -215,14 +215,14 @@ and return Rate struct (or error)
 
 Parameters:
 
-    cFlag - ISO 4217 currency code, depending on the type of the
+    code - ISO 4217 currency code, depending on the type of the
     table available currencies may vary
 */
-func (c *NBPCurrency) GetRateCurrent(cFlag string) (Rate, error) {
+func (c *NBPCurrency) GetRateCurrent(code string) (Rate, error) {
 	var err error
 	var rate Rate
 
-	address := getCurrencyAddress(c.tableType, "current", 0, cFlag)
+	address := getCurrencyAddress(c.tableType, "current", 0, code)
 	c.result, err = getData(address, "json")
 	if err != nil {
 		return rate, err
@@ -260,14 +260,14 @@ and returns Rate struct (or error)
 
 Parameters:
 
-    cFlag - ISO 4217 currency code, depending on the type of the
+    code - ISO 4217 currency code, depending on the type of the
     table available currencies may vary
 */
-func (c *NBPCurrency) GetRateToday(cFlag string) (Rate, error) {
+func (c *NBPCurrency) GetRateToday(code string) (Rate, error) {
 	var err error
 	var rate Rate
 
-	address := getCurrencyAddress(c.tableType, "today", 0, cFlag)
+	address := getCurrencyAddress(c.tableType, "today", 0, code)
 	c.result, err = getData(address, "json")
 	if err != nil {
 		return rate, err
@@ -451,19 +451,19 @@ func (c *NBPCurrency) GetRawOutput() string {
 
 // getCurrencyAddress - function builds download address depending on previously
 // verified input parameters (--table, --date or --last, --code)
-func getCurrencyAddress(tableType string, dFlag string, lFlag int, cFlag string) string {
+func getCurrencyAddress(tableType string, date string, last int, code string) string {
 	var address string
 
-	if lFlag != 0 {
-		address = queryCurrencyLast(tableType, strconv.Itoa(lFlag), cFlag)
-	} else if dFlag == "today" {
-		address = queryCurrencyToday(tableType, cFlag)
-	} else if dFlag == "current" {
-		address = queryCurrencyCurrent(tableType, cFlag)
-	} else if len(dFlag) == 10 {
-		address = queryCurrencyDay(tableType, dFlag, cFlag)
-	} else if len(dFlag) == 21 {
-		address = queryCurrencyRange(tableType, dFlag, cFlag)
+	if last != 0 {
+		address = queryCurrencyLast(tableType, strconv.Itoa(last), code)
+	} else if date == "today" {
+		address = queryCurrencyToday(tableType, code)
+	} else if date == "current" {
+		address = queryCurrencyCurrent(tableType, code)
+	} else if len(date) == 10 {
+		address = queryCurrencyDate(tableType, date, code)
+	} else if len(date) == 21 {
+		address = queryCurrencyRange(tableType, date, code)
 	}
 
 	return address
@@ -489,17 +489,17 @@ func queryCurrencyCurrent(tableType string, currency string) string {
 
 // queryCurrencyDay - returns query: exchange rate for particular currency
 // on the given date (YYYY-MM-DD)
-func queryCurrencyDay(tableType string, day string, currency string) string {
-	return fmt.Sprintf("%s/rates/%s/%s/%s/", baseAddressCurrency, tableType, currency, day)
+func queryCurrencyDate(tableType string, date string, currency string) string {
+	return fmt.Sprintf("%s/rates/%s/%s/%s/", baseAddressCurrency, tableType, currency, date)
 }
 
 // queryCurrencyRange - returns query: exchange rate for particular currency
 // within the given date range (RRRR-MM-DD:RRRR-MM-DD)
-func queryCurrencyRange(tableType string, day string, currency string) string {
+func queryCurrencyRange(tableType string, date string, currency string) string {
 	var startDate string
 	var stopDate string
 
-	temp := strings.Split(day, ":")
+	temp := strings.Split(date, ":")
 	startDate = temp[0]
 	stopDate = temp[1]
 

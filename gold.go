@@ -48,20 +48,20 @@ Function returns error or nil
 
 Parameters:
 
-    dFlag - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
+    date - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
     or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
     (price for today) or 'current' - current gold price (last published)
 
-    lFlag - as an alternative to date, the last <n> prices of gold
+    last - as an alternative to date, the last <n> prices of gold
     can be retrieved
 
-    repFormat - 'json' or 'xml'
+    format - 'json' or 'xml'
 */
-func (g *NBPGold) GoldRaw(dFlag string, lFlag int, repFormat string) error {
+func (g *NBPGold) GoldRaw(date string, last int, format string) error {
 	var err error
 
-	address := getGoldAddress(dFlag, lFlag)
-	g.result, err = getData(address, repFormat)
+	address := getGoldAddress(date, last)
+	g.result, err = getData(address, format)
 	if err != nil {
 		return err
 	}
@@ -77,15 +77,15 @@ Function returns error or nil
 
 Parameters:
 
-    dFlag - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
+    date - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
     or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
     (price for today) or 'current' - current gold price (last published)
 
 */
-func (g *NBPGold) GoldByDate(dFlag string) error {
+func (g *NBPGold) GoldByDate(date string) error {
 	var err error
 
-	address := getGoldAddress(dFlag, 0)
+	address := getGoldAddress(date, 0)
 	g.result, err = getData(address, "json")
 	if err != nil {
 		return err
@@ -107,13 +107,13 @@ Function returns error or nil
 
 Parameters:
 
-    lFlag - as an alternative to date, the last <n> prices of gold
+    last - as an alternative to date, the last <n> prices of gold
     can be retrieved
 */
-func (g *NBPGold) GoldLast(lFlag int) error {
+func (g *NBPGold) GoldLast(last int) error {
 	var err error
 
-	address := getGoldAddress("", lFlag)
+	address := getGoldAddress("", last)
 	g.result, err = getData(address, "json")
 	if err != nil {
 		return err
@@ -259,19 +259,19 @@ func (g *NBPGold) GetRawOutput() string {
 
 // getGoldAddress - build download address depending on previously
 // verified input parameters (--date or --last)
-func getGoldAddress(dFlag string, lFlag int) string {
+func getGoldAddress(date string, last int) string {
 	var address string
 
-	if lFlag != 0 {
-		address = queryGoldLast(strconv.Itoa(lFlag))
-	} else if dFlag == "today" {
+	if last != 0 {
+		address = queryGoldLast(strconv.Itoa(last))
+	} else if date == "today" {
 		address = queryGoldToday()
-	} else if dFlag == "current" {
+	} else if date == "current" {
 		address = queryGoldCurrent()
-	} else if len(dFlag) == 10 {
-		address = queryGoldDay(dFlag)
-	} else if len(dFlag) == 21 {
-		address = queryGoldRange(dFlag)
+	} else if len(date) == 10 {
+		address = queryGoldDate(date)
+	} else if len(date) == 21 {
+		address = queryGoldRange(date)
 	}
 
 	return address
@@ -295,17 +295,17 @@ func queryGoldLast(last string) string {
 
 // queryGoldDay - function returns gold price on the given date (RRRR-MM-DD)
 // in json/xml form, or error
-func queryGoldDay(day string) string {
-	return fmt.Sprintf("%s/%s", baseAddressGold, day)
+func queryGoldDate(date string) string {
+	return fmt.Sprintf("%s/%s", baseAddressGold, date)
 }
 
 // queryGoldRange - returns query: gold prices within the given date range
 // (RRRR-MM-DD:RRRR-MM-DD) in json/xml form, or error
-func queryGoldRange(day string) string {
+func queryGoldRange(date string) string {
 	var startDate string
 	var stopDate string
 
-	temp := strings.Split(day, ":")
+	temp := strings.Split(date, ":")
 	startDate = temp[0]
 	stopDate = temp[1]
 
