@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// low level getData tests
 func TestGetGoldCurrent(t *testing.T) {
 	littleDelay()
 	address := queryGoldCurrent()
@@ -129,5 +130,41 @@ func TestGetGoldRange(t *testing.T) {
 
 	if nbpGold[1].Data != day[11:] {
 		t.Errorf("invalid date, %s expected, %s received", day[11:], nbpGold[1].Data)
+	}
+}
+
+// NBPGold methods test
+
+func TestShouldGetGoldByDateSuccess(t *testing.T) {
+	var result []GoldRate
+	date := "2020-12-01"
+	expected := 211.7400 // the real price of gold on December 12, 2020 was PLN 211.7400
+
+	apiClient := NewGold()
+	result, err := apiClient.GetPriceByDate(date)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if result[0].Data != date {
+		t.Errorf("invalid date, %s expected, %s recived", date, result[0].Data)
+	}
+	if result[0].Price != expected {
+		t.Errorf("invalid price, %.4f expected, %.4f received", expected, result[0].Price)
+	}
+}
+
+func TestShouldGetGoldCurrentSuccess(t *testing.T) {
+	var result []GoldRate
+	date := "current"
+
+	apiClient := NewGold()
+	result, err := apiClient.GetPriceByDate(date)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if !(result[0].Price > 0) {
+		t.Errorf("invalid current price, expected >0, %.4f received", result[0].Price)
 	}
 }
