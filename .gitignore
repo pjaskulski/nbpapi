@@ -17,3 +17,7 @@
 # docs
 doc.sh
 doc.txt
+
+# vs code
+*.code-workspace
+.vscode/

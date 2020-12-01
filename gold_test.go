@@ -140,6 +140,8 @@ func TestShouldGetGoldByDateSuccess(t *testing.T) {
 	date := "2020-12-01"
 	expected := 211.7400 // the real price of gold on December 12, 2020 was PLN 211.7400
 
+	littleDelay()
+
 	apiClient := NewGold()
 	result, err := apiClient.GetPriceByDate(date)
 	if err != nil {
@@ -158,6 +160,8 @@ func TestShouldGetGoldCurrentSuccess(t *testing.T) {
 	var result []GoldRate
 	date := "current"
 
+	littleDelay()
+
 	apiClient := NewGold()
 	result, err := apiClient.GetPriceByDate(date)
 	if err != nil {
@@ -166,5 +170,23 @@ func TestShouldGetGoldCurrentSuccess(t *testing.T) {
 
 	if !(result[0].Price > 0) {
 		t.Errorf("invalid current price, expected >0, %.4f received", result[0].Price)
+	}
+}
+
+func TestGetPriceToday(t *testing.T) {
+	var err error
+
+	today := time.Now()
+	var date string = today.Format("2006-01-02")
+
+	littleDelay()
+
+	apiClient := NewGold()
+	_, err = apiClient.GetPriceByDate(date)
+	if err == nil {
+		_, err := apiClient.GetPriceToday()
+		if err != nil {
+			t.Errorf("expected: err == nil, received: err != nil")
+		}
 	}
 }
