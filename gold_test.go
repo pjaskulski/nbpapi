@@ -190,3 +190,21 @@ func TestGetPriceToday(t *testing.T) {
 		}
 	}
 }
+
+func TestGetPriceCurrentShouldReturnNonZeroPrice(t *testing.T) {
+	var err error
+	var result GoldRate
+
+	littleDelay()
+
+	apiClient := NewGold()
+	result, err = apiClient.GetPriceCurrent()
+
+	if err != nil {
+		t.Errorf("expected: err == nil, received: err != nil")
+	}
+
+	if result.Price <= 0 {
+		t.Errorf("incorrect price of gold was received")
+	}
+}
