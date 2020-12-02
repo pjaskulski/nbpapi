@@ -6,12 +6,14 @@ import (
 )
 
 func TestLittleDelayShouldBeBetween400And650(t *testing.T) {
-	start := time.Now()
-	littleDelay()
-	duration := time.Since(start)
-	diff := duration.Milliseconds()
-	if diff < 400 || diff > 650 {
-		t.Errorf("Delay outside the expected range of 400-650")
+	for i := 1; i <= 10; i++ {
+		start := time.Now()
+		littleDelay()
+		duration := time.Since(start)
+		diff := duration.Milliseconds()
+		if diff < 400 || diff > 650 {
+			t.Errorf("Delay outside the expected range of 400-650")
+		}
 	}
 }
 

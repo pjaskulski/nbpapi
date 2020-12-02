@@ -246,10 +246,67 @@ func TestQueryGoldDate(t *testing.T) {
 }
 
 func TestQueryGoldRange(t *testing.T) {
-	var want string = "http://api.nbp.pl/api/cenyzlota/2020-11-12/2020-11-19"
+	want := "http://api.nbp.pl/api/cenyzlota/2020-11-12/2020-11-19"
 
 	got := queryGoldRange("2020-11-12:2020-11-19")
 	if got != want {
 		t.Errorf("want %s, got %s", want, got)
+	}
+}
+
+func TestGetGoldAddress(t *testing.T) {
+	want := "http://api.nbp.pl/api/cenyzlota/2020-11-12/2020-11-19"
+
+	got := getGoldAddress("2020-11-12:2020-11-19", 0)
+	if got != want {
+		t.Errorf("want %s, got %s", want, got)
+	}
+
+	want = "http://api.nbp.pl/api/cenyzlota/2020-11-12"
+	got = getGoldAddress("2020-11-12", 0)
+	if got != want {
+		t.Errorf("want %s, got %s", want, got)
+	}
+
+	want = "http://api.nbp.pl/api/cenyzlota/last/5"
+	got = getGoldAddress("", 5)
+	if got != want {
+		t.Errorf("want %s, got %s", want, got)
+	}
+
+	want = "http://api.nbp.pl/api/cenyzlota"
+	got = getGoldAddress("current", 0)
+	if got != want {
+		t.Errorf("want %s, got %s", want, got)
+	}
+
+	want = "http://api.nbp.pl/api/cenyzlota/today"
+	got = getGoldAddress("today", 0)
+	if got != want {
+		t.Errorf("want %s, got %s", want, got)
+	}
+}
+
+func TestGoldGetCSVOutput(t *testing.T) {
+	var err error
+	var result string
+
+	littleDelay()
+
+	apiClient := NewGold()
+	err = apiClient.GoldByDate("current")
+
+	if err != nil {
+		t.Errorf("expected: err == nil, received: err != nil")
+	}
+
+	result = apiClient.GetCSVOutput("en")
+
+	if len(result) == 0 {
+		t.Errorf("incorrect (empty) CSV output")
+	}
+
+	if result[:16] != "DATE,PRICE (PLN)" {
+		t.Errorf("incorrect CSV output")
 	}
 }
