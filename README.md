@@ -6,9 +6,9 @@
 [![go report](https://goreportcard.com/badge/github.com/pjaskulski/kursnbp)](https://goreportcard.com/report/github.com/pjaskulski/nbpapi) 
 
 
-Go library for NBP (National Bank of Poland) api 
+Go library for NBP (National Bank of Poland) API: [http://api.nbp.pl/en.html](http://api.nbp.pl/en.html)
 
-Library used in the kursNBP project: [https://github.com/pjaskulski/kursnbp](https://github.com/pjaskulski/kursnbp)
+The library is used in the kursNBP project: [https://github.com/pjaskulski/kursnbp](https://github.com/pjaskulski/kursnbp)
 
 
 To install and use:
