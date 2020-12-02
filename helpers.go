@@ -5,6 +5,7 @@ package nbpapi
 import (
 	"errors"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"time"
 )
@@ -52,5 +53,16 @@ func getData(address string, format string) ([]byte, error) {
 
 // littleDelay - delay function, so as not to bother the NBP server too much...
 func littleDelay() {
-	time.Sleep(time.Millisecond * 500)
+	interval := randomInteger(400, 650)
+	time.Sleep(time.Millisecond * time.Duration(interval))
+}
+
+// randomInteger func
+func randomInteger(minValue int, maxValue int) int {
+	var result int
+
+	rand.Seed(time.Now().UnixNano())
+	result = rand.Intn(maxValue-minValue+1) + minValue
+
+	return result
 }
