@@ -208,3 +208,48 @@ func TestGetPriceCurrentShouldReturnNonZeroPrice(t *testing.T) {
 		t.Errorf("incorrect price of gold was received")
 	}
 }
+
+func TestQueryGoldToday(t *testing.T) {
+	var want string = "http://api.nbp.pl/api/cenyzlota/today"
+
+	got := queryGoldToday()
+	if got != want {
+		t.Errorf("want %s, got %s", want, got)
+	}
+}
+
+func TestQueryGoldCurrent(t *testing.T) {
+	var want string = "http://api.nbp.pl/api/cenyzlota"
+
+	got := queryGoldCurrent()
+	if got != want {
+		t.Errorf("want %s, got %s", want, got)
+	}
+}
+
+func TestQueryGoldLast(t *testing.T) {
+	var want string = "http://api.nbp.pl/api/cenyzlota/last/5"
+
+	got := queryGoldLast("5")
+	if got != want {
+		t.Errorf("want %s, got %s", want, got)
+	}
+}
+
+func TestQueryGoldDate(t *testing.T) {
+	var want string = "http://api.nbp.pl/api/cenyzlota/2020-11-12"
+
+	got := queryGoldDate("2020-11-12")
+	if got != want {
+		t.Errorf("want %s, got %s", want, got)
+	}
+}
+
+func TestQueryGoldRange(t *testing.T) {
+	var want string = "http://api.nbp.pl/api/cenyzlota/2020-11-12/2020-11-19"
+
+	got := queryGoldRange("2020-11-12:2020-11-19")
+	if got != want {
+		t.Errorf("want %s, got %s", want, got)
+	}
+}
