@@ -139,3 +139,48 @@ func TestGetTableTodayFailed(t *testing.T) {
 		t.Errorf("expected: err != nil, received: err != nil")
 	}
 }
+
+func TestQueryTableDate(t *testing.T) {
+	want := "http://api.nbp.pl/api/exchangerates/tables/A/2020-12-02/"
+
+	got := queryTableDate("A", "2020-12-02")
+	if got != want {
+		t.Errorf("want %s, got %s", want, got)
+	}
+}
+
+func TestQueryTableCurrent(t *testing.T) {
+	want := "http://api.nbp.pl/api/exchangerates/tables/A/"
+
+	got := queryTableCurrent("A")
+	if got != want {
+		t.Errorf("want %s, got %s", want, got)
+	}
+}
+
+func TestQueryTableToday(t *testing.T) {
+	want := "http://api.nbp.pl/api/exchangerates/tables/A/today/"
+
+	got := queryTableToday("A")
+	if got != want {
+		t.Errorf("want %s, got %s", want, got)
+	}
+}
+
+func TestQueryTableLast(t *testing.T) {
+	want := "http://api.nbp.pl/api/exchangerates/tables/A/last/3/"
+
+	got := queryTableLast("A", "3")
+	if got != want {
+		t.Errorf("want %s, got %s", want, got)
+	}
+}
+
+func TestQueryTableRange(t *testing.T) {
+	want := "http://api.nbp.pl/api/exchangerates/tables/A/2020-12-01/2020-12-02/"
+
+	got := queryTableRange("A", "2020-12-01:2020-12-02")
+	if got != want {
+		t.Errorf("want %s, got %s", want, got)
+	}
+}

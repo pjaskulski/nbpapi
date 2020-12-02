@@ -145,3 +145,48 @@ func TestGetCurrencyToday(t *testing.T) {
 		}
 	}
 }
+
+func TestQueryCurrencyRange(t *testing.T) {
+	want := "http://api.nbp.pl/api/exchangerates/rates/A/CHF/2020-11-12/2020-11-19/"
+
+	got := queryCurrencyRange("A", "2020-11-12:2020-11-19", "CHF")
+	if got != want {
+		t.Errorf("want %s, got %s", want, got)
+	}
+}
+
+func TestQueryCurrencyLast(t *testing.T) {
+	want := "http://api.nbp.pl/api/exchangerates/rates/A/CHF/last/5/"
+
+	got := queryCurrencyLast("A", "5", "CHF")
+	if got != want {
+		t.Errorf("want %s, got %s", want, got)
+	}
+}
+
+func TestQueryCurrencyToday(t *testing.T) {
+	want := "http://api.nbp.pl/api/exchangerates/rates/A/CHF/today/"
+
+	got := queryCurrencyToday("A", "CHF")
+	if got != want {
+		t.Errorf("want %s, got %s", want, got)
+	}
+}
+
+func TestQueryCurrencyCurrent(t *testing.T) {
+	want := "http://api.nbp.pl/api/exchangerates/rates/A/CHF/"
+
+	got := queryCurrencyCurrent("A", "CHF")
+	if got != want {
+		t.Errorf("want %s, got %s", want, got)
+	}
+}
+
+func TestQueryCurrencyDate(t *testing.T) {
+	want := "http://api.nbp.pl/api/exchangerates/rates/A/CHF/2020-11-12/"
+
+	got := queryCurrencyDate("A", "2020-11-12", "CHF")
+	if got != want {
+		t.Errorf("want %s, got %s", want, got)
+	}
+}
