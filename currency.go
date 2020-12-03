@@ -102,7 +102,7 @@ Parameters:
 
     format - 'json' or 'xml'
 */
-func (c *NBPCurrency) CurrencyRaw(date string, last int, code string, format string) error {
+func (c *NBPCurrency) CurrencyRaw(code string, date string, last int, format string) error {
 	var err error
 
 	url := c.getCurrencyAddress(c.tableType, date, last, code)
@@ -129,7 +129,7 @@ Parameters:
     code - ISO 4217 currency code, depending on the type of the
     table available currencies may vary
 */
-func (c *NBPCurrency) CurrencyByDate(date string, code string) error {
+func (c *NBPCurrency) CurrencyByDate(code string, date string) error {
 	var err error
 
 	url := c.getCurrencyAddress(c.tableType, date, 0, code)

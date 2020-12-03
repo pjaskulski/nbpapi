@@ -133,7 +133,7 @@ type NBPCurrency struct {
 func NewCurrency(tableType string) *NBPCurrency
     NewCurrency - function creates new currency type
 
-func (c *NBPCurrency) CurrencyByDate(date string, code string) error
+func (c *NBPCurrency) CurrencyByDate(code string, date string) error
     CurrencyByDate - function downloads and writes data to exchange (exchangeC)
     slice, raw data (json) still available in result field
 
@@ -164,7 +164,7 @@ func (c *NBPCurrency) CurrencyLast(code string, last int) error
         last - as an alternative to date, the last <n> tables/rates
         can be retrieved
 
-func (c *NBPCurrency) CurrencyRaw(date string, last int, code string, format string) error
+func (c *NBPCurrency) CurrencyRaw(code string, date string, last int, format string) error
     CurrencyRaw - function downloads data in json or xml form
 
 
@@ -251,6 +251,7 @@ func (c *NBPCurrency) GetRawOutput() string
 
 type NBPGold struct {
 	GoldRates []GoldRate
+
 	// Has unexported fields.
 }
     NBPGold type

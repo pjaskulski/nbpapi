@@ -14,7 +14,7 @@ func TestGetCurrencyCurrent(t *testing.T) {
 	littleDelay()
 	client := NewCurrency(table)
 
-	err := client.CurrencyByDate("current", currency)
+	err := client.CurrencyByDate(currency, "current")
 	if err != nil {
 		t.Errorf("expected: err == nil, received: err != nil")
 	}
@@ -52,7 +52,7 @@ func TestGetCurrencyDay(t *testing.T) {
 	littleDelay()
 	client := NewCurrency(table)
 
-	err := client.CurrencyByDate(day, currency)
+	err := client.CurrencyByDate(currency, day)
 	if err != nil {
 		t.Errorf("expected: err == nil, received: err != nil")
 	}
@@ -79,7 +79,7 @@ func TestGetCurrencyDaySaturdayFailed(t *testing.T) {
 
 	client := NewCurrency(table)
 
-	err := client.CurrencyByDate(day, currency)
+	err := client.CurrencyByDate(currency, day)
 	if err == nil {
 		t.Errorf("expected: err != nil, received: err == nil")
 	}
@@ -221,7 +221,7 @@ func TestCurrencyCSVOutput(t *testing.T) {
 	want := "TABLE,DATE,AVERAGE (PLN)"
 
 	client := NewCurrency("A")
-	err := client.CurrencyByDate("current", "EUR")
+	err := client.CurrencyByDate("EUR", "current")
 	if err != nil {
 		t.Error(err)
 	}
