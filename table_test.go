@@ -2,6 +2,7 @@ package nbpapi
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
 	"time"
 )
@@ -188,6 +189,47 @@ func TestTableCSVOutput(t *testing.T) {
 	}
 }
 
+func TestTableCCSVOutput(t *testing.T) {
+	want := "TABLE,CODE,NAME,BUY (PLN),SELL (PLN)"
+
+	client := NewTable("C")
+	err := client.TableByDate("current")
+	if err != nil {
+		t.Error(err)
+	}
+	output := client.GetCSVOutput("en")
+	header := output[:len(want)]
+	if header != want {
+		t.Errorf("invalid csv output, expected header: %s, got: %s", want, header)
+	}
+}
+
+func TestTableRaw(t *testing.T) {
+	client := NewTable("C")
+
+	err := client.TableRaw("2020-12-02", 0, "json")
+	if err != nil {
+		t.Errorf("want err == nil, got err != nil")
+	}
+	if !json.Valid(client.result) {
+		t.Errorf("incorrect json content was received")
+	}
+}
+
+func TestGetTableRawOutput(t *testing.T) {
+	client := NewTable("C")
+
+	err := client.TableRaw("2020-12-02", 0, "json")
+	if err != nil {
+		t.Errorf("want err == nil, got err != nil")
+	}
+
+	output := client.GetRawOutput()
+	if output == "" {
+		t.Errorf("invalid (empty) raw output")
+	}
+}
+
 func TestGetTableCurrent(t *testing.T) {
 	client := NewTable("A")
 	_, err := client.GetTableCurrent()
@@ -196,10 +238,122 @@ func TestGetTableCurrent(t *testing.T) {
 	}
 }
 
+func TestGetTableCurrentFailed(t *testing.T) {
+	client := NewTable("C")
+	_, err := client.GetTableCurrent()
+	if err == nil {
+		t.Errorf("want: err != nil, got err == nil")
+	}
+}
+
 func TestGetTableCCurrent(t *testing.T) {
 	client := NewTable("C")
 	_, err := client.GetTableCCurrent()
 	if err != nil {
 		t.Errorf("want: err == nil, got err != nil")
+	}
+}
+
+func TestGetTableCCurrentFailed(t *testing.T) {
+	client := NewTable("A")
+	_, err := client.GetTableCCurrent()
+	if err == nil {
+		t.Errorf("want: err != nil, got err == nil")
+	}
+}
+
+func TestTablePrettyOutput(t *testing.T) {
+
+	client := NewTable("A")
+	err := client.TableByDate("current")
+	if err != nil {
+		t.Error(err)
+	}
+	output := client.GetPrettyOutput("en")
+
+	if len(output) == 0 {
+		t.Errorf("incorrect (empty) pretty output")
+	}
+
+	text := "Table type:"
+	if !strings.Contains(output, text) {
+		t.Errorf("incorrect pretty output")
+	}
+
+	text = "Table number:"
+	if !strings.Contains(output, text) {
+		t.Errorf("incorrect pretty output")
+	}
+}
+
+func TestTableCPrettyOutput(t *testing.T) {
+
+	client := NewTable("C")
+	err := client.TableByDate("current")
+	if err != nil {
+		t.Error(err)
+	}
+	output := client.GetPrettyOutput("en")
+
+	if len(output) == 0 {
+		t.Errorf("incorrect (empty) pretty output")
+	}
+
+	text := "Table type:"
+	if !strings.Contains(output, text) {
+		t.Errorf("incorrect pretty output")
+	}
+
+	text = "Table number:"
+	if !strings.Contains(output, text) {
+		t.Errorf("incorrect pretty output")
+	}
+}
+
+func TestTableCByDate(t *testing.T) {
+	var table string = "C"
+	var day string = "2020-11-17"
+	var tableNo string = "224/C/NBP/2020"
+
+	littleDelay()
+
+	client := NewTable(table)
+
+	err := client.TableByDate(day)
+	if err != nil {
+		t.Errorf("expected: err == nil, received: err != nil")
+	}
+	if !json.Valid(client.result) {
+		t.Errorf("incorrect json content was received")
+	}
+
+	if client.ExchangeC[0].Table != table {
+		t.Errorf("invalid table type, expected: %s, received: %s", table, client.ExchangeC[0].Table)
+	}
+	if client.ExchangeC[0].No != tableNo {
+		t.Errorf("invalid table number, expected: %s, received: %s", tableNo, client.ExchangeC[0].No)
+	}
+	if client.ExchangeC[0].EffectiveDate != day {
+		t.Errorf("invalid publication date, expected: %s, received: %s", day, client.ExchangeC[0].EffectiveDate)
+	}
+}
+
+func TestTableLastC(t *testing.T) {
+	var table string = "C"
+	var lastNo int = 5
+
+	littleDelay()
+	client := NewTable(table)
+	err := client.TableLast(lastNo)
+
+	if err != nil {
+		t.Errorf("expected: err == nil, received: err != nil")
+	}
+	if !json.Valid(client.result) {
+		t.Errorf("incorrect json content was received")
+	}
+
+	if len(client.ExchangeC) != 5 {
+		t.Errorf("5 exchange rate tables were expected, received: %d", len(client.ExchangeC))
 	}
 }

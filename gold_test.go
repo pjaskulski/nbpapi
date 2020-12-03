@@ -2,6 +2,7 @@ package nbpapi
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
 	"time"
 )
@@ -310,6 +311,31 @@ func TestGoldGetCSVOutput(t *testing.T) {
 	}
 }
 
+func TestGoldGetPrettyOutput(t *testing.T) {
+	var err error
+	var result string
+
+	littleDelay()
+
+	apiClient := NewGold()
+	err = apiClient.GoldByDate("current")
+
+	if err != nil {
+		t.Errorf("expected: err == nil, received: err != nil")
+	}
+
+	result = apiClient.GetPrettyOutput("en")
+
+	if len(result) == 0 {
+		t.Errorf("incorrect (empty) pretty output")
+	}
+
+	text := "The price of 1g of gold (of 1000 millesimal fineness)"
+	if !strings.Contains(result, text) {
+		t.Errorf("incorrect pretty output")
+	}
+}
+
 func TestGoldGetDataFailed(t *testing.T) {
 	type args struct {
 		url    string
@@ -356,5 +382,31 @@ func TestGoldGetDataFailed(t *testing.T) {
 				return
 			}
 		})
+	}
+}
+
+func TestGoldRaw(t *testing.T) {
+	client := NewGold()
+
+	err := client.GoldRaw("2020-12-02", 0, "json")
+	if err != nil {
+		t.Errorf("want err == nil, got err != nil")
+	}
+	if !json.Valid(client.result) {
+		t.Errorf("incorrect json content was received")
+	}
+}
+
+func TestGoldRawOutput(t *testing.T) {
+	client := NewGold()
+
+	err := client.GoldLast(1)
+	if err != nil {
+		t.Error(err)
+	}
+
+	output := client.GetRawOutput()
+	if output == "" {
+		t.Errorf("invalid (empty) raw output")
 	}
 }

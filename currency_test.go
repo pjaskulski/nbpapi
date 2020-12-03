@@ -2,6 +2,7 @@ package nbpapi
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
 	"time"
 )
@@ -228,5 +229,87 @@ func TestCurrencyCSVOutput(t *testing.T) {
 	output := client.GetCSVOutput("en")
 	if output[:24] != want {
 		t.Errorf("invalid csv output, expected header: %s, got: %s", want, output[:29])
+	}
+}
+
+func TestCurrencyPrettyOutput(t *testing.T) {
+
+	client := NewCurrency("A")
+	err := client.CurrencyByDate("EUR", "current")
+	if err != nil {
+		t.Error(err)
+	}
+	output := client.GetPrettyOutput("en")
+
+	if len(output) == 0 {
+		t.Errorf("incorrect (empty) pretty output")
+	}
+
+	text := "Table type:"
+	if !strings.Contains(output, text) {
+		t.Errorf("incorrect pretty output")
+	}
+}
+
+func TestCurrencyRaw(t *testing.T) {
+	client := NewCurrency("C")
+
+	err := client.CurrencyRaw("EUR", "2020-12-02", 0, "json")
+	if err != nil {
+		t.Errorf("want err == nil, got err != nil")
+	}
+	if !json.Valid(client.result) {
+		t.Errorf("incorrect json content was received")
+	}
+}
+
+func TestCurrencyToday(t *testing.T) {
+	today := time.Now()
+	var day string = today.Format("2006-01-02")
+	var code string = "CHF"
+	var table string = "C"
+
+	client := NewCurrency(table)
+
+	err := client.CurrencyByDate(code, day)
+	if err == nil {
+		err = client.CurrencyToday(code)
+		if err != nil {
+			t.Errorf("want: err == nil, got: err != nil")
+		}
+	}
+}
+
+func TestGetRateCurrent(t *testing.T) {
+	client := NewCurrency("C")
+
+	result, err := client.GetRateCurrent("CHF")
+	if err != nil {
+		t.Errorf("want: err == nil, got: err != nil")
+	}
+
+	if result.Ask == 0 && result.Bid == 0 {
+		t.Errorf("want ask and bid != 0, got: %.4f and %.4f", result.Ask, result.Bid)
+	}
+}
+
+func TestGetRateToday(t *testing.T) {
+	today := time.Now()
+	var day string = today.Format("2006-01-02")
+	var code string = "CHF"
+	var table string = "C"
+
+	client := NewCurrency(table)
+
+	_, err := client.GetRateByDate(code, day)
+	if err == nil {
+		result, err := client.GetRateToday(code)
+		if err != nil {
+			t.Errorf("want: err == nil, got: err != nil")
+		}
+
+		if result.Ask == 0 && result.Bid == 0 {
+			t.Errorf("want ask and bid != 0, got: %.4f and %.4f", result.Ask, result.Bid)
+		}
 	}
 }
