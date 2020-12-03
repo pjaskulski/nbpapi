@@ -29,7 +29,7 @@ func main() {
 		slice of GoldPrice struct, in case of date it is always 1 element,
 		in case of range of date is more
 	*/
-	gold.GoldByDate("2020-11-12")
+	err = gold.GoldByDate("2020-11-12")
 	if err != nil {
 		fmt.Println(err)
 	} else {

@@ -31,9 +31,13 @@ func main() {
 		log.Fatal(err)
 	}
 	defer f.Close()
-	f.WriteString(nbpMid.GetCSVOutput("en"))
-	fmt.Println()
 
+	_, err = f.WriteString(nbpMid.GetCSVOutput("en"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println()
 	fmt.Println("Print last 5 (CHF) currency rates...")
 
 	// print as CSV, polish version
