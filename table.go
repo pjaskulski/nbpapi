@@ -13,9 +13,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"strconv"
 	"strings"
 	"text/tabwriter"
+	"time"
 )
 
 // base addresses of the NBP API service
@@ -29,6 +31,7 @@ type NBPTable struct {
 	result    []byte
 	Exchange  []ExchangeTable
 	ExchangeC []ExchangeTableC
+	client    *http.Client
 }
 
 type rateTable struct {
@@ -65,9 +68,14 @@ type ExchangeTableC struct {
 
 // NewTable - function creates new table type
 func NewTable(tableType string) *NBPTable {
-	return &NBPTable{
-		tableType: tableType,
+	cli := &http.Client{
+		Timeout: time.Second * 10,
 	}
+	r := &NBPTable{
+		tableType: tableType,
+		client:    cli,
+	}
+	return r
 }
 
 /*
@@ -90,8 +98,8 @@ Parameters:
 func (t *NBPTable) TableRaw(date string, last int, format string) error {
 	var err error
 
-	address := getTableAddress(t.tableType, date, last)
-	t.result, err = getData(address, format)
+	url := getTableAddress(t.tableType, date, last)
+	t.result, err = t.getData(url, format)
 	if err != nil {
 		return err
 	}
@@ -115,8 +123,8 @@ Parameters:
 func (t *NBPTable) TableByDate(date string) error {
 	var err error
 
-	address := getTableAddress(t.tableType, date, 0)
-	t.result, err = getData(address, "json")
+	url := getTableAddress(t.tableType, date, 0)
+	t.result, err = t.getData(url, "json")
 	if err != nil {
 		return err
 	}
@@ -148,8 +156,8 @@ Parameters:
 func (t *NBPTable) TableLast(last int) error {
 	var err error
 
-	address := getTableAddress(t.tableType, "", last)
-	t.result, err = getData(address, "json")
+	url := getTableAddress(t.tableType, "", last)
+	t.result, err = t.getData(url, "json")
 	if err != nil {
 		return err
 	}
@@ -178,8 +186,8 @@ func (t *NBPTable) GetTableCurrent() ([]ExchangeTable, error) {
 		return nil, errors.New("Invalid function call context, use GetTableCCurrent")
 	}
 
-	address := getTableAddress(t.tableType, "current", 0)
-	t.result, err = getData(address, "json")
+	url := getTableAddress(t.tableType, "current", 0)
+	t.result, err = t.getData(url, "json")
 	if err != nil {
 		return nil, err
 	}
@@ -204,8 +212,8 @@ func (t *NBPTable) GetTableCCurrent() ([]ExchangeTableC, error) {
 		return nil, errors.New("Invalid function call context, use GetTableCurrent")
 	}
 
-	address := getTableAddress(t.tableType, "current", 0)
-	t.result, err = getData(address, "json")
+	url := getTableAddress(t.tableType, "current", 0)
+	t.result, err = t.getData(url, "json")
 	if err != nil {
 		return nil, err
 	}
@@ -327,6 +335,17 @@ func (t *NBPTable) GetCSVOutput(lang string) string {
 // GetRawOutput - function returns just result of request (json or xml)
 func (t *NBPTable) GetRawOutput() string {
 	return string(t.result)
+}
+
+/* getData - function that retrieves data from the NBP website
+   and returns them in the form of JSON / XML (or error), based on
+   the arguments provided:
+
+   url - NBP web api address
+   format - 'json' or 'xml'
+*/
+func (t *NBPTable) getData(url string, format string) ([]byte, error) {
+	return fetchData(t.client, url, format)
 }
 
 // Private func

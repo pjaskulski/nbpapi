@@ -2,139 +2,128 @@ package nbpapi
 
 import (
 	"encoding/json"
-	"log"
 	"testing"
 	"time"
 )
 
-func TestGetTableCurrent(t *testing.T) {
+func TestTableByDateCurrent(t *testing.T) {
 	var table string = "A"
 
 	littleDelay()
-	address := queryTableCurrent(table)
-	result, err := getData(address, "json")
+
+	client := NewTable(table)
+
+	err := client.TableByDate("current")
 	if err != nil {
 		t.Errorf("expected: err == nil, received: err != nil")
 	}
-	if !json.Valid(result) {
+	if !json.Valid(client.result) {
 		t.Errorf("incorrect json content was received")
 	}
 }
 
-func TestGetTableDay(t *testing.T) {
+func TestTableByDate(t *testing.T) {
 	var table string = "A"
 	var day string = "2020-11-17"
 	var tableNo string = "224/A/NBP/2020"
 
 	littleDelay()
-	address := queryTableDate(table, day)
-	result, err := getData(address, "json")
+
+	client := NewTable(table)
+
+	err := client.TableByDate(day)
 	if err != nil {
 		t.Errorf("expected: err == nil, received: err != nil")
 	}
-	if !json.Valid(result) {
+	if !json.Valid(client.result) {
 		t.Errorf("incorrect json content was received")
 	}
 
-	var nbpTables []ExchangeTable
-	err = json.Unmarshal(result, &nbpTables)
-	if err != nil {
-		log.Fatal(err)
+	if client.Exchange[0].Table != table {
+		t.Errorf("invalid table type, expected: %s, received: %s", table, client.Exchange[0].Table)
 	}
-
-	if nbpTables[0].Table != table {
-		t.Errorf("invalid table type, expected: %s, received: %s", table, nbpTables[0].Table)
+	if client.Exchange[0].No != tableNo {
+		t.Errorf("invalid table number, expected: %s, received: %s", tableNo, client.Exchange[0].No)
 	}
-	if nbpTables[0].No != tableNo {
-		t.Errorf("invalid table number, expected: %s, received: %s", tableNo, nbpTables[0].No)
-	}
-	if nbpTables[0].EffectiveDate != day {
-		t.Errorf("invalid publication date, expected: %s, received: %s", day, nbpTables[0].EffectiveDate)
+	if client.Exchange[0].EffectiveDate != day {
+		t.Errorf("invalid publication date, expected: %s, received: %s", day, client.Exchange[0].EffectiveDate)
 	}
 }
 
-func TestGetTableRange(t *testing.T) {
+func TestTableByDateRange(t *testing.T) {
 	var table string = "A"
 	var day string = "2020-11-16:2020-11-17"
 
 	littleDelay()
-	address := queryTableRange(table, day)
-	result, err := getData(address, "json")
+
+	client := NewTable(table)
+
+	err := client.TableByDate(day)
 	if err != nil {
 		t.Errorf("expected: err == nil, received: err != nil")
 	}
-	if !json.Valid(result) {
+	if !json.Valid(client.result) {
 		t.Errorf("incorrect json content was received")
 	}
 
-	var nbpTables []ExchangeTable
-	err = json.Unmarshal(result, &nbpTables)
-	if err != nil {
-		log.Fatal(err)
+	if len(client.Exchange) != 2 {
+		t.Errorf("2 exchange rate tables were expected, received: %d", len(client.Exchange))
 	}
 
-	if len(nbpTables) != 2 {
-		t.Errorf("2 exchange rate tables were expected, received: %d", len(nbpTables))
+	if client.Exchange[0].Table != table {
+		t.Errorf("invalid table type, expected: %s, received: %s", table, client.Exchange[0].Table)
 	}
 
-	if nbpTables[0].Table != table {
-		t.Errorf("invalid table type, expected: %s, received: %s", table, nbpTables[0].Table)
-	}
-
-	if nbpTables[1].Table != table {
-		t.Errorf("invalid table type, expected: %s, received: %s", table, nbpTables[1].Table)
+	if client.Exchange[1].Table != table {
+		t.Errorf("invalid table type, expected: %s, received: %s", table, client.Exchange[1].Table)
 	}
 }
 
-func TestGetTableLast(t *testing.T) {
+func TestTableLast(t *testing.T) {
 	var table string = "A"
-	var lastNo string = "5"
+	var lastNo int = 5
 
 	littleDelay()
-	address := queryTableLast(table, lastNo)
-	result, err := getData(address, "json")
+	client := NewTable(table)
+	err := client.TableLast(lastNo)
+
 	if err != nil {
 		t.Errorf("expected: err == nil, received: err != nil")
 	}
-	if !json.Valid(result) {
+	if !json.Valid(client.result) {
 		t.Errorf("incorrect json content was received")
 	}
 
-	var nbpTables []ExchangeTable
-	err = json.Unmarshal(result, &nbpTables)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if len(nbpTables) != 5 {
-		t.Errorf("5 exchange rate tables were expected, received: %d", len(nbpTables))
+	if len(client.Exchange) != 5 {
+		t.Errorf("5 exchange rate tables were expected, received: %d", len(client.Exchange))
 	}
 }
 
-func TestGetTableToday(t *testing.T) {
+func TestTableByDateToday(t *testing.T) {
 	var table string = "A"
-	var address string
 	today := time.Now()
 	var day string = today.Format("2006-01-02")
 
 	littleDelay()
-	address = queryTableDate(table, day)
-	_, err := getData(address, "json")
+	client := NewTable(table)
+
+	err := client.TableByDate(day)
 	if err == nil {
-		address = queryTableToday(table)
-		_, err := getData(address, "json")
+		err := client.TableByDate("today")
 		if err != nil {
 			t.Errorf("expected: err == nil, received: err != nil")
 		}
 	}
 }
 
-func TestGetTableTodayFailed(t *testing.T) {
+func TestTableByDateFailed(t *testing.T) {
 	var table string = "D"
 
 	littleDelay()
-	address := queryTableToday(table)
-	_, err := getData(address, "json")
+
+	client := NewTable(table)
+
+	err := client.TableByDate("today")
 	if err == nil {
 		t.Errorf("expected: err != nil, received: err != nil")
 	}
@@ -182,5 +171,35 @@ func TestQueryTableRange(t *testing.T) {
 	got := queryTableRange("A", "2020-12-01:2020-12-02")
 	if got != want {
 		t.Errorf("want %s, got %s", want, got)
+	}
+}
+
+func TestTableCSVOutput(t *testing.T) {
+	want := "TABLE,CODE,NAME,AVERAGE (PLN)"
+
+	client := NewTable("A")
+	err := client.TableByDate("current")
+	if err != nil {
+		t.Error(err)
+	}
+	output := client.GetCSVOutput("en")
+	if output[:29] != want {
+		t.Errorf("invalid csv output, expected header: %s, got: %s", want, output[:29])
+	}
+}
+
+func TestGetTableCurrent(t *testing.T) {
+	client := NewTable("A")
+	_, err := client.GetTableCurrent()
+	if err != nil {
+		t.Errorf("want: err == nil, got err != nil")
+	}
+}
+
+func TestGetTableCCurrent(t *testing.T) {
+	client := NewTable("C")
+	_, err := client.GetTableCCurrent()
+	if err != nil {
+		t.Errorf("want: err == nil, got err != nil")
 	}
 }

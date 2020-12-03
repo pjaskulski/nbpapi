@@ -2,8 +2,6 @@ package nbpapi
 
 import (
 	"encoding/json"
-	"log"
-	"strings"
 	"testing"
 	"time"
 )
@@ -11,25 +9,36 @@ import (
 func TestGetCurrencyCurrent(t *testing.T) {
 	var table string = "A"
 	var currency string = "CHF"
+	var currencyName string = "frank szwajcarski"
 
 	littleDelay()
-	address := queryCurrencyCurrent(table, currency)
-	result, err := getData(address, "json")
+	client := NewCurrency(table)
+
+	err := client.CurrencyByDate("current", currency)
 	if err != nil {
 		t.Errorf("expected: err == nil, received: err != nil")
 	}
-	if !strings.Contains(string(result), "\"table\":\"A\",\"currency\":\"frank szwajcarski\"") {
-		t.Errorf("incorrect json content was received")
+
+	if client.Exchange.Table != table {
+		t.Errorf("Type of table: want: %s, got: %s", table, client.Exchange.Table)
+	}
+	if client.Exchange.Currency != currencyName {
+		t.Errorf("Currency name: want: %s, got: %s", currencyName, client.Exchange.Currency)
+	}
+	if len(client.Exchange.Rates) != 1 {
+		t.Errorf("expected 1 exchange currency rate, received: %d", len(client.Exchange.Rates))
 	}
 }
 
 func TestGetCurrencyCurrentXXX(t *testing.T) {
 	var table string = "A"
-	var currency string = "XXX" // niepoprawny kod waluty
+	var currency string = "XXX" // invalid currency code
 
 	littleDelay()
-	address := queryCurrencyCurrent(table, currency)
-	_, err := getData(address, "json")
+
+	client := NewCurrency(table)
+
+	_, err := client.GetRateCurrent(currency)
 	if err == nil {
 		t.Errorf("expected: err != nil, received: err == nil")
 	}
@@ -41,25 +50,36 @@ func TestGetCurrencyDay(t *testing.T) {
 	var day string = "2020-11-13" // Friday 13 Nov 2020, CHF = 4.1605
 
 	littleDelay()
-	address := queryCurrencyDate(table, day, currency)
-	result, err := getData(address, "json")
+	client := NewCurrency(table)
+
+	err := client.CurrencyByDate(day, currency)
 	if err != nil {
 		t.Errorf("expected: err == nil, received: err != nil")
 	}
-	// mało eleganckie ale skuteczne
-	if !strings.Contains(string(result), "\"effectiveDate\":\"2020-11-13\",\"mid\":4.1605") {
-		t.Errorf("incorrect json content was received, the CHF exchange rate on November 13, 2020 was 4.1605")
+
+	if !json.Valid(client.result) {
+		t.Errorf("incorrect json content was received")
+	}
+
+	if client.Exchange.Rates[0].EffectiveDate != day {
+		t.Errorf("incorect effectiveDate, want: %s, got %s", day, client.Exchange.Rates[0].EffectiveDate)
+	}
+
+	if client.Exchange.Rates[0].Mid != 4.1605 {
+		t.Errorf("incorrect data, the CHF exchange rate on 2020-11-13 was 4.1605, not %.4f", client.Exchange.Rates[0].Mid)
 	}
 }
 
-func TestGetCurrencyDaySaturday(t *testing.T) {
+func TestGetCurrencyDaySaturdayFailed(t *testing.T) {
 	var table string = "A"
 	var currency string = "CHF"
 	var day string = "2020-11-14" // Saturday - no table of exchange rates
 
 	littleDelay()
-	address := queryCurrencyDate(table, day, currency)
-	_, err := getData(address, "json")
+
+	client := NewCurrency(table)
+
+	err := client.CurrencyByDate(day, currency)
 	if err == nil {
 		t.Errorf("expected: err != nil, received: err == nil")
 	}
@@ -68,24 +88,30 @@ func TestGetCurrencyDaySaturday(t *testing.T) {
 func TestGetCurrencyLast(t *testing.T) {
 	var table string = "A"
 	var currency string = "CHF"
-	var last string = "5"
+	var last int = 5
 
 	littleDelay()
-	address := queryCurrencyLast(table, last, currency)
-	_, err := getData(address, "json")
+	client := NewCurrency(table)
+
+	err := client.CurrencyLast(currency, last)
 	if err != nil {
 		t.Errorf("expected: err == nil, received: err != nil")
+	}
+	if len(client.Exchange.Rates) != 5 {
+		t.Errorf("want: %d, got: %d", last, len(client.Exchange.Rates))
 	}
 }
 
 func TestGetCurrencyLastFailed(t *testing.T) {
 	var table string = "A"
 	var currency string = "CHF"
-	var last string = "500" // za dużo kursów, max = 255
+	var last int = 500 // nbp api real max = 255
 
 	littleDelay()
-	address := queryCurrencyLast(table, last, currency)
-	_, err := getData(address, "json")
+
+	client := NewCurrency(table)
+
+	err := client.CurrencyLast(currency, last)
 	if err == nil {
 		t.Errorf("expected: err != nil, received: err == nil")
 	}
@@ -94,21 +120,18 @@ func TestGetCurrencyLastFailed(t *testing.T) {
 func TestGetCurrencyRange(t *testing.T) {
 	var table string = "A"
 	var currency string = "CHF"
-	var day string = "2020-11-12:2020-11-13" // poprawny zakres dat, spodziewane 2 kursy
+	var day string = "2020-11-12:2020-11-13" // valid range, expected 2 currency exchange rates
 
 	littleDelay()
-	address := queryCurrencyRange(table, day, currency)
-	result, err := getData(address, "json")
+	client := NewCurrency(table)
+
+	result, err := client.GetRateByDate(currency, day)
 	if err != nil {
 		t.Errorf("expected: err == nil, received: err != nil")
 	}
 
-	var nbpCurrency exchangeCurrency
-	err = json.Unmarshal(result, &nbpCurrency)
-	if err != nil {
-		log.Fatal(err)
-	}
-	var ratesCount int = len(nbpCurrency.Rates)
+	var ratesCount int = len(result)
+
 	if ratesCount != 2 {
 		t.Errorf("expected number of exchange rates == 2, obtained %d", ratesCount)
 	}
@@ -117,11 +140,13 @@ func TestGetCurrencyRange(t *testing.T) {
 func TestGetCurrencyRangeFailed(t *testing.T) {
 	var table string = "A"
 	var currency string = "CHF"
-	var day string = "2020-11-12:2020-11-10" // niepoprawny zakres dat
+	var day string = "2020-11-12:2020-11-10" // invalid range of dates
 
 	littleDelay()
-	address := queryCurrencyRange(table, day, currency)
-	_, err := getData(address, "json")
+
+	client := NewCurrency(table)
+
+	_, err := client.GetRateByDate(currency, day)
 	if err == nil {
 		t.Errorf("expected: err != nil, received: err == nil")
 	}
@@ -130,21 +155,22 @@ func TestGetCurrencyRangeFailed(t *testing.T) {
 func TestGetCurrencyToday(t *testing.T) {
 	var table string = "A"
 	var currency string = "CHF"
-	var address string
 	today := time.Now()
 	var day string = today.Format("2006-01-02")
 
 	littleDelay()
-	address = queryCurrencyDate(table, day, currency)
-	_, err := getData(address, "json")
+	client := NewCurrency(table)
+
+	_, err := client.GetRateByDate(currency, day)
 	if err == nil {
-		address = queryCurrencyToday(table, currency)
-		_, err := getData(address, "json")
+		_, err := client.GetRateToday(currency)
 		if err != nil {
 			t.Errorf("expected: err == nil, received: err != nil")
 		}
 	}
 }
+
+// query tests
 
 func TestQueryCurrencyRange(t *testing.T) {
 	want := "http://api.nbp.pl/api/exchangerates/rates/A/CHF/2020-11-12/2020-11-19/"
@@ -188,5 +214,19 @@ func TestQueryCurrencyDate(t *testing.T) {
 	got := queryCurrencyDate("A", "2020-11-12", "CHF")
 	if got != want {
 		t.Errorf("want %s, got %s", want, got)
+	}
+}
+
+func TestCurrencyCSVOutput(t *testing.T) {
+	want := "TABLE,DATE,AVERAGE (PLN)"
+
+	client := NewCurrency("A")
+	err := client.CurrencyByDate("current", "EUR")
+	if err != nil {
+		t.Error(err)
+	}
+	output := client.GetCSVOutput("en")
+	if output[:24] != want {
+		t.Errorf("invalid csv output, expected header: %s, got: %s", want, output[:29])
 	}
 }

@@ -12,9 +12,11 @@ package nbpapi
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"strconv"
 	"strings"
 	"text/tabwriter"
+	"time"
 )
 
 // base addresses of the NBP API service
@@ -28,6 +30,7 @@ type NBPCurrency struct {
 	result    []byte
 	Exchange  exchangeCurrency
 	ExchangeC exchangeCurrencyC
+	client    *http.Client
 }
 
 type rateCurrency struct {
@@ -68,9 +71,14 @@ type Rate struct {
 
 // NewCurrency - function creates new currency type
 func NewCurrency(tableType string) *NBPCurrency {
-	return &NBPCurrency{
-		tableType: tableType,
+	cli := &http.Client{
+		Timeout: time.Second * 10,
 	}
+	r := &NBPCurrency{
+		tableType: tableType,
+		client:    cli,
+	}
+	return r
 }
 
 // Public func
@@ -97,8 +105,8 @@ Parameters:
 func (c *NBPCurrency) CurrencyRaw(date string, last int, code string, format string) error {
 	var err error
 
-	address := getCurrencyAddress(c.tableType, date, last, code)
-	c.result, err = getData(address, format)
+	url := c.getCurrencyAddress(c.tableType, date, last, code)
+	c.result, err = c.getData(url, format)
 	if err != nil {
 		return err
 	}
@@ -124,8 +132,8 @@ Parameters:
 func (c *NBPCurrency) CurrencyByDate(date string, code string) error {
 	var err error
 
-	address := getCurrencyAddress(c.tableType, date, 0, code)
-	c.result, err = getData(address, "json")
+	url := c.getCurrencyAddress(c.tableType, date, 0, code)
+	c.result, err = c.getData(url, "json")
 	if err != nil {
 		return err
 	}
@@ -159,8 +167,8 @@ Parameters:
 func (c *NBPCurrency) CurrencyLast(code string, last int) error {
 	var err error
 
-	address := getCurrencyAddress(c.tableType, "", last, code)
-	c.result, err = getData(address, "json")
+	url := c.getCurrencyAddress(c.tableType, "", last, code)
+	c.result, err = c.getData(url, "json")
 	if err != nil {
 		return err
 	}
@@ -191,8 +199,8 @@ Parameters:
 func (c *NBPCurrency) CurrencyToday(code string) error {
 	var err error
 
-	address := getCurrencyAddress(c.tableType, "today", 0, code)
-	c.result, err = getData(address, "json")
+	url := c.getCurrencyAddress(c.tableType, "today", 0, code)
+	c.result, err = c.getData(url, "json")
 	if err != nil {
 		return err
 	}
@@ -222,8 +230,8 @@ func (c *NBPCurrency) GetRateCurrent(code string) (Rate, error) {
 	var err error
 	var rate Rate
 
-	address := getCurrencyAddress(c.tableType, "current", 0, code)
-	c.result, err = getData(address, "json")
+	url := c.getCurrencyAddress(c.tableType, "current", 0, code)
+	c.result, err = c.getData(url, "json")
 	if err != nil {
 		return rate, err
 	}
@@ -267,8 +275,8 @@ func (c *NBPCurrency) GetRateToday(code string) (Rate, error) {
 	var err error
 	var rate Rate
 
-	address := getCurrencyAddress(c.tableType, "today", 0, code)
-	c.result, err = getData(address, "json")
+	url := c.getCurrencyAddress(c.tableType, "today", 0, code)
+	c.result, err = c.getData(url, "json")
 	if err != nil {
 		return rate, err
 	}
@@ -317,8 +325,8 @@ func (c *NBPCurrency) GetRateByDate(code string, date string) ([]Rate, error) {
 	var rates []Rate
 	var rate Rate
 
-	address := getCurrencyAddress(c.tableType, date, 0, code)
-	c.result, err = getData(address, "json")
+	url := c.getCurrencyAddress(c.tableType, date, 0, code)
+	c.result, err = c.getData(url, "json")
 	if err != nil {
 		return nil, err
 	}
@@ -447,11 +455,22 @@ func (c *NBPCurrency) GetRawOutput() string {
 	return string(c.result)
 }
 
+/* getData - function that retrieves data from the NBP website
+   and returns them in the form of JSON / XML (or error), based on
+   the arguments provided:
+
+   url - NBP web api address
+   format - 'json' or 'xml'
+*/
+func (c *NBPCurrency) getData(url string, format string) ([]byte, error) {
+	return fetchData(c.client, url, format)
+}
+
 // Private func
 
 // getCurrencyAddress - function builds download address depending on previously
 // verified input parameters (--table, --date or --last, --code)
-func getCurrencyAddress(tableType string, date string, last int, code string) string {
+func (c *NBPCurrency) getCurrencyAddress(tableType string, date string, last int, code string) string {
 	var address string
 
 	if last != 0 {

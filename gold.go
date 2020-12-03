@@ -12,9 +12,11 @@ package nbpapi
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"strconv"
 	"strings"
 	"text/tabwriter"
+	"time"
 )
 
 // base addresses of the NBP API service
@@ -32,13 +34,20 @@ type GoldRate struct {
 type NBPGold struct {
 	GoldRates []GoldRate
 	result    []byte
+	client    *http.Client
 }
 
 // Public
 
 // NewGold - function creates new gold type
 func NewGold() *NBPGold {
-	return &NBPGold{}
+	cli := &http.Client{
+		Timeout: time.Second * 10,
+	}
+	r := &NBPGold{
+		client: cli,
+	}
+	return r
 }
 
 /*
@@ -60,8 +69,8 @@ Parameters:
 func (g *NBPGold) GoldRaw(date string, last int, format string) error {
 	var err error
 
-	address := getGoldAddress(date, last)
-	g.result, err = getData(address, format)
+	url := g.getGoldAddress(date, last)
+	g.result, err = g.getData(url, format)
 	if err != nil {
 		return err
 	}
@@ -85,8 +94,8 @@ Parameters:
 func (g *NBPGold) GoldByDate(date string) error {
 	var err error
 
-	address := getGoldAddress(date, 0)
-	g.result, err = getData(address, "json")
+	url := g.getGoldAddress(date, 0)
+	g.result, err = g.getData(url, "json")
 	if err != nil {
 		return err
 	}
@@ -113,8 +122,8 @@ Parameters:
 func (g *NBPGold) GoldLast(last int) error {
 	var err error
 
-	address := getGoldAddress("", last)
-	g.result, err = getData(address, "json")
+	url := g.getGoldAddress("", last)
+	g.result, err = g.getData(url, "json")
 	if err != nil {
 		return err
 	}
@@ -134,8 +143,8 @@ as GoldRate struct
 func (g *NBPGold) GetPriceToday() (GoldRate, error) {
 	var err error
 
-	address := getGoldAddress("today", 0)
-	g.result, err = getData(address, "json")
+	url := g.getGoldAddress("today", 0)
+	g.result, err = g.getData(url, "json")
 	if err != nil {
 		return GoldRate{}, err
 	}
@@ -155,8 +164,8 @@ GoldRate struct
 func (g *NBPGold) GetPriceCurrent() (GoldRate, error) {
 	var err error
 
-	address := getGoldAddress("current", 0)
-	g.result, err = getData(address, "json")
+	url := g.getGoldAddress("current", 0)
+	g.result, err = g.getData(url, "json")
 	if err != nil {
 		return GoldRate{}, err
 	}
@@ -182,8 +191,8 @@ Parameters:
 func (g *NBPGold) GetPriceByDate(date string) ([]GoldRate, error) {
 	var err error
 
-	address := getGoldAddress(date, 0)
-	g.result, err = getData(address, "json")
+	url := g.getGoldAddress(date, 0)
+	g.result, err = g.getData(url, "json")
 	if err != nil {
 		return nil, err
 	}
@@ -255,11 +264,22 @@ func (g *NBPGold) GetRawOutput() string {
 	return string(g.result)
 }
 
+/* getData - function that retrieves data from the NBP website
+   and returns them in the form of JSON / XML (or error), based on
+   the arguments provided:
+
+   url - NBP web api address
+   format - 'json' or 'xml'
+*/
+func (g *NBPGold) getData(url string, format string) ([]byte, error) {
+	return fetchData(g.client, url, format)
+}
+
 // private func
 
 // getGoldAddress - build download address depending on previously
 // verified input parameters (--date or --last)
-func getGoldAddress(date string, last int) string {
+func (g *NBPGold) getGoldAddress(date string, last int) string {
 	var address string
 
 	if last != 0 {

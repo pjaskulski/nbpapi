@@ -2,8 +2,6 @@ package nbpapi
 
 import (
 	"encoding/json"
-	"log"
-	"strconv"
 	"testing"
 	"time"
 )
@@ -11,27 +9,35 @@ import (
 // low level getData tests
 func TestGetGoldCurrent(t *testing.T) {
 	littleDelay()
-	address := queryGoldCurrent()
-	result, err := getData(address, "json")
+
+	apiClient := NewGold()
+	result, err := apiClient.GetPriceCurrent()
+
 	if err != nil {
 		t.Errorf("expected: err == nil, received: err != nil")
 	}
-	if !json.Valid(result) {
+
+	if !json.Valid(apiClient.result) {
 		t.Errorf("incorrect json content was received")
+	}
+
+	if result.Price <= 0 {
+		t.Errorf("incorrect price of gold was received")
 	}
 }
 
 func TestGetGoldToday(t *testing.T) {
 	today := time.Now()
-	var address string
 	var day string = today.Format("2006-01-02")
+	var err error
 
 	littleDelay()
-	address = queryGoldDate(day)
-	_, err := getData(address, "json")
+
+	apiClient := NewGold()
+
+	_, err = apiClient.GetPriceByDate(day)
 	if err == nil {
-		address = queryGoldToday()
-		_, err := getData(address, "json")
+		_, err := apiClient.GetPriceToday()
 		if err != nil {
 			t.Errorf("expected: err == nil, received: err != nil")
 		}
@@ -43,26 +49,22 @@ func TestGetGoldDay(t *testing.T) {
 	var cena float64 = 229.03
 
 	littleDelay()
-	address := queryGoldDate(day)
-	result, err := getData(address, "json")
+
+	apiClient := NewGold()
+
+	err := apiClient.GoldByDate(day)
 	if err != nil {
 		t.Errorf("expected: err == nil, received: err != nil")
 	}
-	if !json.Valid(result) {
+	if !json.Valid(apiClient.result) {
 		t.Errorf("incorrect json content was received")
 	}
 
-	var nbpGold []GoldRate
-	err = json.Unmarshal(result, &nbpGold)
-	if err != nil {
-		log.Fatal(err)
+	if apiClient.GoldRates[0].Data != day {
+		t.Errorf("invalid date, %s expected, %s received", day, apiClient.GoldRates[0].Data)
 	}
-
-	if nbpGold[0].Data != day {
-		t.Errorf("invalid date, %s expected, %s received", day, nbpGold[0].Data)
-	}
-	if nbpGold[0].Price != cena {
-		t.Errorf("invalid price, expected %.4f, received %.4f", cena, nbpGold[0].Price)
+	if apiClient.GoldRates[0].Price != cena {
+		t.Errorf("invalid price, expected %.4f, received %.4f", cena, apiClient.GoldRates[0].Price)
 	}
 }
 
@@ -70,8 +72,10 @@ func TestGetGoldDayFailed(t *testing.T) {
 	var day string = "2020-11-15" // brak notowań w tym dniu
 
 	littleDelay()
-	address := queryGoldDate(day)
-	_, err := getData(address, "json")
+
+	apiClient := NewGold()
+	_, err := apiClient.GetPriceByDate(day)
+
 	if err == nil {
 		t.Errorf("expected: err != nil, received: err == nil")
 	}
@@ -81,23 +85,19 @@ func TestGetGoldLast(t *testing.T) {
 	var lastNo int = 5
 
 	littleDelay()
-	address := queryGoldLast(strconv.Itoa(lastNo))
-	result, err := getData(address, "json")
+
+	apiClient := NewGold()
+	err := apiClient.GoldLast(lastNo)
+
 	if err != nil {
 		t.Errorf("expected: err == nil, received: err != nil")
 	}
-	if !json.Valid(result) {
+	if !json.Valid(apiClient.result) {
 		t.Errorf("incorrect json content was received")
 	}
 
-	var nbpGold []GoldRate
-	err = json.Unmarshal(result, &nbpGold)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if len(nbpGold) != lastNo {
-		t.Errorf("expected: %d exchange rate tables, received: %d", lastNo, len(nbpGold))
+	if len(apiClient.GoldRates) != lastNo {
+		t.Errorf("expected: %d exchange rate tables, received: %d", lastNo, len(apiClient.GoldRates))
 	}
 }
 
@@ -105,31 +105,28 @@ func TestGetGoldRange(t *testing.T) {
 	var day string = "2020-11-16:2020-11-17"
 
 	littleDelay()
-	address := queryGoldRange(day)
-	result, err := getData(address, "json")
+
+	apiClient := NewGold()
+
+	err := apiClient.GoldByDate(day)
 	if err != nil {
 		t.Errorf("expected: err == nil, received: err != nil")
 	}
-	if !json.Valid(result) {
+
+	if !json.Valid(apiClient.result) {
 		t.Errorf("incorrect json content was received")
 	}
 
-	var nbpGold []GoldRate
-	err = json.Unmarshal(result, &nbpGold)
-	if err != nil {
-		log.Fatal(err)
+	if len(apiClient.GoldRates) != 2 {
+		t.Errorf("gold prices were expected from 2 quotes, obtained from %d", len(apiClient.GoldRates))
 	}
 
-	if len(nbpGold) != 2 {
-		t.Errorf("gold prices were expected from 2 quotes, obtained from %d", len(nbpGold))
+	if apiClient.GoldRates[0].Data != day[0:10] {
+		t.Errorf("invalid date, %s expected, %s received", day[0:10], apiClient.GoldRates[0].Data)
 	}
 
-	if nbpGold[0].Data != day[0:10] {
-		t.Errorf("invalid date, %s expected, %s received", day[0:10], nbpGold[0].Data)
-	}
-
-	if nbpGold[1].Data != day[11:] {
-		t.Errorf("invalid date, %s expected, %s received", day[11:], nbpGold[1].Data)
+	if apiClient.GoldRates[1].Data != day[11:] {
+		t.Errorf("invalid date, %s expected, %s received", day[11:], apiClient.GoldRates[0].Data)
 	}
 }
 
@@ -255,33 +252,35 @@ func TestQueryGoldRange(t *testing.T) {
 }
 
 func TestGetGoldAddress(t *testing.T) {
+	apiClient := NewGold()
+
 	want := "http://api.nbp.pl/api/cenyzlota/2020-11-12/2020-11-19"
 
-	got := getGoldAddress("2020-11-12:2020-11-19", 0)
+	got := apiClient.getGoldAddress("2020-11-12:2020-11-19", 0)
 	if got != want {
 		t.Errorf("want %s, got %s", want, got)
 	}
 
 	want = "http://api.nbp.pl/api/cenyzlota/2020-11-12"
-	got = getGoldAddress("2020-11-12", 0)
+	got = apiClient.getGoldAddress("2020-11-12", 0)
 	if got != want {
 		t.Errorf("want %s, got %s", want, got)
 	}
 
 	want = "http://api.nbp.pl/api/cenyzlota/last/5"
-	got = getGoldAddress("", 5)
+	got = apiClient.getGoldAddress("", 5)
 	if got != want {
 		t.Errorf("want %s, got %s", want, got)
 	}
 
 	want = "http://api.nbp.pl/api/cenyzlota"
-	got = getGoldAddress("current", 0)
+	got = apiClient.getGoldAddress("current", 0)
 	if got != want {
 		t.Errorf("want %s, got %s", want, got)
 	}
 
 	want = "http://api.nbp.pl/api/cenyzlota/today"
-	got = getGoldAddress("today", 0)
+	got = apiClient.getGoldAddress("today", 0)
 	if got != want {
 		t.Errorf("want %s, got %s", want, got)
 	}
@@ -308,5 +307,54 @@ func TestGoldGetCSVOutput(t *testing.T) {
 
 	if result[:16] != "DATE,PRICE (PLN)" {
 		t.Errorf("incorrect CSV output")
+	}
+}
+
+func TestGoldGetDataFailed(t *testing.T) {
+	type args struct {
+		url    string
+		format string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Invalid url",
+			args: args{
+				url:    "http://api.nbp.pl/api/cenyzlotx",
+				format: "json",
+			},
+			wantErr: true,
+		},
+		{
+			name: "Invalid range od dates",
+			args: args{
+				url:    "http://api.nbp.pl/api/cenyzlota/2020-11-12/2020-11-10",
+				format: "json",
+			},
+			wantErr: true,
+		},
+		{
+			name: "Invalid date",
+			args: args{
+				url:    "http://api.nbp.pl/api/cenyzlota/2020-11-29",
+				format: "json",
+			},
+			wantErr: true,
+		},
+	}
+
+	client := NewGold()
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := client.getData(tt.args.url, tt.args.format)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("getData() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+		})
 	}
 }
