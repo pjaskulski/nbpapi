@@ -70,12 +70,10 @@ Output:
     
 ```go
 // today's gold price: function GetPriceToday returns GoldPrice struct
-var price nbpapi.GoldRate
-var err error
 
 gold := nbpapi.NewGold()
 
-price, err = gold.GetPriceToday()
+price, err := gold.GetPriceToday()
 if err != nil {
 	fmt.Println(err)
 } else {
