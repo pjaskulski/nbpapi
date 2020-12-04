@@ -19,33 +19,13 @@ import (
 	"time"
 )
 
-// base addresses of the NBP API service
-const (
-	baseAddressGold string = "http://api.nbp.pl/api/cenyzlota"
-)
-
-// GoldRate type
-type GoldRate struct {
-	Data  string  `json:"data"`
-	Price float64 `json:"cena"`
-}
-
-// NBPGold type
-type NBPGold struct {
-	GoldRates []GoldRate
-	result    []byte
-	client    *http.Client
-}
-
-// Public
-
 // NewGold - function creates new gold type
 func NewGold() *NBPGold {
 	cli := &http.Client{
 		Timeout: time.Second * 10,
 	}
 	r := &NBPGold{
-		client: cli,
+		Client: cli,
 	}
 	return r
 }
@@ -272,10 +252,10 @@ func (g *NBPGold) GetRawOutput() string {
    format - 'json' or 'xml'
 */
 func (g *NBPGold) getData(url string, format string) ([]byte, error) {
-	return fetchData(g.client, url, format)
+	return fetchData(g.Client, url, format)
 }
 
-// private func
+// ------------------- private func -----------------------------------
 
 // getGoldAddress - build download address depending on previously
 // verified input parameters (--date or --last)

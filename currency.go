@@ -19,56 +19,6 @@ import (
 	"time"
 )
 
-// base addresses of the NBP API service
-const (
-	baseAddressCurrency string = "http://api.nbp.pl/api/exchangerates"
-)
-
-// NBPCurrency type
-type NBPCurrency struct {
-	tableType string
-	result    []byte
-	Exchange  exchangeCurrency
-	ExchangeC exchangeCurrencyC
-	client    *http.Client
-}
-
-type rateCurrency struct {
-	No            string  `json:"no"`
-	EffectiveDate string  `json:"effectiveDate"`
-	Mid           float64 `json:"mid"`
-}
-
-type exchangeCurrency struct {
-	Table    string         `json:"table"`
-	Currency string         `json:"currency"`
-	Code     string         `json:"code"`
-	Rates    []rateCurrency `json:"rates"`
-}
-
-type rateCurrencyC struct {
-	No            string  `json:"no"`
-	EffectiveDate string  `json:"effectiveDate"`
-	Bid           float64 `json:"bid"`
-	Ask           float64 `json:"ask"`
-}
-
-type exchangeCurrencyC struct {
-	Table    string          `json:"table"`
-	Currency string          `json:"currency"`
-	Code     string          `json:"code"`
-	Rates    []rateCurrencyC `json:"rates"`
-}
-
-// Rate type
-type Rate struct {
-	No            string
-	EffectiveDate string
-	Mid           float64
-	Bid           float64
-	Ask           float64
-}
-
 // NewCurrency - function creates new currency type
 func NewCurrency(tableType string) *NBPCurrency {
 	cli := &http.Client{
@@ -76,12 +26,10 @@ func NewCurrency(tableType string) *NBPCurrency {
 	}
 	r := &NBPCurrency{
 		tableType: tableType,
-		client:    cli,
+		Client:    cli,
 	}
 	return r
 }
-
-// Public func
 
 /*
 CurrencyRaw - function downloads data in json or xml form
@@ -463,10 +411,10 @@ func (c *NBPCurrency) GetRawOutput() string {
    format - 'json' or 'xml'
 */
 func (c *NBPCurrency) getData(url string, format string) ([]byte, error) {
-	return fetchData(c.client, url, format)
+	return fetchData(c.Client, url, format)
 }
 
-// Private func
+// --------------------- Private func ---------------------------------
 
 // getCurrencyAddress - function builds download address depending on previously
 // verified input parameters (--table, --date or --last, --code)

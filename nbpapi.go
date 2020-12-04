@@ -6,6 +6,13 @@ import (
 	"net/http"
 )
 
+// base addresses of the NBP API service
+const (
+	baseAddressTable    string = "http://api.nbp.pl/api/exchangerates"
+	baseAddressCurrency string = "http://api.nbp.pl/api/exchangerates"
+	baseAddressGold     string = "http://api.nbp.pl/api/cenyzlota"
+)
+
 // SetLang function (language setting for output functions)
 func setLang(lang string) {
 	if lang == "pl" {

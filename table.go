@@ -20,52 +20,6 @@ import (
 	"time"
 )
 
-// base addresses of the NBP API service
-const (
-	baseAddressTable string = "http://api.nbp.pl/api/exchangerates"
-)
-
-// NBPTable type
-type NBPTable struct {
-	tableType string
-	result    []byte
-	Exchange  []ExchangeTable
-	ExchangeC []ExchangeTableC
-	client    *http.Client
-}
-
-type rateTable struct {
-	Currency string  `json:"currency"`
-	Code     string  `json:"code"`
-	Mid      float64 `json:"mid"`
-}
-
-// ExchangeTable type
-type ExchangeTable struct {
-	Table         string      `json:"table"`
-	No            string      `json:"no"`
-	EffectiveDate string      `json:"effectiveDate"`
-	Rates         []rateTable `json:"rates"`
-}
-
-type rateTableC struct {
-	Currency string  `json:"currency"`
-	Code     string  `json:"code"`
-	Bid      float64 `json:"bid"`
-	Ask      float64 `json:"ask"`
-}
-
-// ExchangeTableC type
-type ExchangeTableC struct {
-	Table         string       `json:"table"`
-	No            string       `json:"no"`
-	TradingDate   string       `json:"tradingDate"`
-	EffectiveDate string       `json:"effectiveDate"`
-	Rates         []rateTableC `json:"rates"`
-}
-
-// Public func
-
 // NewTable - function creates new table type
 func NewTable(tableType string) *NBPTable {
 	cli := &http.Client{
@@ -73,7 +27,7 @@ func NewTable(tableType string) *NBPTable {
 	}
 	r := &NBPTable{
 		tableType: tableType,
-		client:    cli,
+		Client:    cli,
 	}
 	return r
 }
@@ -345,10 +299,10 @@ func (t *NBPTable) GetRawOutput() string {
    format - 'json' or 'xml'
 */
 func (t *NBPTable) getData(url string, format string) ([]byte, error) {
-	return fetchData(t.client, url, format)
+	return fetchData(t.Client, url, format)
 }
 
-// Private func
+// --------------------- Private func ---------------------------------
 
 // getTableAddress - build download address depending on previously
 // verified input parameters (--table, --date or --last)

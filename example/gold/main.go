@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/pjaskulski/nbpapi"
 )
@@ -14,6 +15,7 @@ func main() {
 	var err error
 
 	gold := nbpapi.NewGold()
+	gold.Client.Timeout = time.Second * 10
 
 	price, err = gold.GetPriceCurrent()
 	if err != nil {
@@ -42,7 +44,7 @@ func main() {
 		function GetPriceByDate return slice of GoldPrice struct
 	*/
 	var prices []nbpapi.GoldRate
-	prices, err = gold.GetPriceByDate("2020-11-12:2020-11-19")
+	prices, err = gold.GetPriceByDate("2020-10-01:2020-12-03")
 	if err != nil {
 		fmt.Println(err)
 	} else {
