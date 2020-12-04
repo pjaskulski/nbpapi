@@ -39,13 +39,13 @@ make cover
 // table of exchange rates)
 var tableNo string
 
-nbpTable := nbpapi.NewTable("A")
-err: = nbpTable.TableByDate("2020-11-12")
+client := nbpapi.NewTable("A")
+err: = client.TableByDate("2020-11-12")
 if err != nil {
 	log.Fatal(err)
 }
 
-for _, item := range nbpTable.Exchange {
+for _, item := range client.Exchange {
 	tableNo = item.No
 	for _, currencyItem := range item.Rates {
 		fmt.Println(tableNo, currencyItem.Code, currencyItem.Currency, currencyItem.Mid)
@@ -126,6 +126,7 @@ type GoldRate struct {
 type NBPCurrency struct {
 	Exchange  exchangeCurrency
 	ExchangeC exchangeCurrencyC
+	Client    *http.Client
 	// Has unexported fields.
 }
     NBPCurrency type
@@ -252,6 +253,7 @@ func (c *NBPCurrency) GetRawOutput() string
 type NBPGold struct {
 	GoldRates []GoldRate
 
+	Client *http.Client
 	// Has unexported fields.
 }
     NBPGold type
@@ -340,6 +342,7 @@ func (g *NBPGold) GoldRaw(date string, last int, format string) error
 type NBPTable struct {
 	Exchange  []ExchangeTable
 	ExchangeC []ExchangeTableC
+	Client    *http.Client
 	// Has unexported fields.
 }
     NBPTable type
