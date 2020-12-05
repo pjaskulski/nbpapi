@@ -93,10 +93,11 @@ More examples in the \ example folder.
 ## Documentation:
 
 1. **NBPTable** type - complete tables of currency exchange rates:
-    * metodhs downloading data into NBPTable type structures:
-      - TableRaw (only raw data: json or xml) 
-      - TableByDate (raw data and and structures filled with data)
-      - TableLast (as above)
+    * create new: `client := NewTable("C")`
+    * methods that downloading data into NBPTable type structures:
+      - TableRaw _(only raw data: json or xml)_ 
+      - TableByDate _(raw data and and structures filled with data)_
+      - TableLast _(as above)_
     * methods that return structures with tables of currency exchange rates:
       - GetTableCurrent 
       - GetTableCCurrent 
@@ -109,11 +110,12 @@ More examples in the \ example folder.
       - GetCSVOutput
       - GetRawOutput
 2. **NBPCurrency** type - particular currency exchange rates:
-    * metodhs retrieving data into NBPCurrency type structures:
-      - CurrencyRaw 
-      - CurrencyByDate 
-      - CurrencyLast
-      - CurrencyToday
+    * create new: `client := NewCurrency("A")`
+    * methods that downloading data into NBPCurrency type structures:
+      - CurrencyRaw _(only raw data: json or xml)_
+      - CurrencyByDate _(raw data and and structures filled with data)_
+      - CurrencyLast _(as above)_
+      - CurrencyToday _(as above)_
     * methods that return structures with currency rates:
       - GetRateCurrent 
       - GetRateToday
@@ -123,10 +125,11 @@ More examples in the \ example folder.
       - GetCSVOutput 
       - GetRawOutput
 3. **NBPGold** type - gold prices:
-    * metodhs retrieving data into NBPGold type structures:
-      - GoldRaw
-      - GoldByDate 
-      - GoldLast
+    * create new: `client := NewGold()`
+    * methods that downloading data into NBPGold type structures:
+      - GoldRaw _(only raw data: json or xml)_
+      - GoldByDate _(raw data and and structures filled with data)_
+      - GoldLast _(as above)_
     * methods that return structures with prices of gold:
       - GetPriceToday
       - GetPriceCurrent 
