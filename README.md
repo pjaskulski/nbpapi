@@ -92,6 +92,53 @@ More examples in the \ example folder.
 
 ## Documentation:
 
+1. **NBPTable** type - complete tables of currency exchange rates:
+    * metodhs downloading data into NBPTable type structures:
+      - TableRaw (only raw data: json or xml) 
+      - TableByDate (raw data and and structures filled with data)
+      - TableLast (as above)
+    * methods that return structures with tables of currency exchange rates:
+      - GetTableCurrent 
+      - GetTableCCurrent 
+      - GetTableToday 
+      - GetTableCToday 
+      - GetTableByDay 
+      - GetTableCByDay
+    * methods that return data (downloaded previously by TableByDate, or TableLast methods) as text, ready to be printed or saved to a file:
+	  - GetPrettyOutput 
+      - GetCSVOutput
+      - GetRawOutput
+2. **NBPCurrency** type - particular currency exchange rates:
+    * metodhs retrieving data into NBPCurrency type structures:
+      - CurrencyRaw 
+      - CurrencyByDate 
+      - CurrencyLast
+      - CurrencyToday
+    * methods that return structures with currency rates:
+      - GetRateCurrent 
+      - GetRateToday
+      - GetRateByDate
+    * methods that return data (downloaded previously) as text, ready to be printed or saved to a file:
+      - GetPrettyOutput 
+      - GetCSVOutput 
+      - GetRawOutput
+3. **NBPGold** type - gold prices:
+    * metodhs retrieving data into NBPGold type structures:
+      - GoldRaw
+      - GoldByDate 
+      - GoldLast
+    * methods that return structures with prices of gold:
+      - GetPriceToday
+      - GetPriceCurrent 
+      - GetPriceByDate
+    * methods that return data (downloaded previously) as text, ready to be printed or saved to a file:
+      - GetPrettyOutput 
+      - GetCSVOutput 
+      - GetRawOutput
+
+
+Detailed documentation:    
+
 ```
 package nbpapi // import "github.com/pjaskulski/nbpapi"
 
