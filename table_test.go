@@ -99,8 +99,7 @@ func TestTableLast(t *testing.T) {
 
 func TestTableByDateToday(t *testing.T) {
 	var table string = "A"
-	today := time.Now()
-	var day string = today.Format("2006-01-02")
+	day := time.Now().Format("2006-01-02")
 
 	littleDelay()
 	client := NewTable(table)

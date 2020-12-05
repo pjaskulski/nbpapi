@@ -199,8 +199,7 @@ func TestGetCurrencyRangeFailed(t *testing.T) {
 func TestGetCurrencyToday(t *testing.T) {
 	var table string = "A"
 	var currency string = "CHF"
-	today := time.Now()
-	var day string = today.Format("2006-01-02")
+	day := time.Now().Format("2006-01-02")
 
 	littleDelay()
 	client := NewCurrency(table)
@@ -307,8 +306,7 @@ func TestCurrencyRaw(t *testing.T) {
 }
 
 func TestCurrencyToday(t *testing.T) {
-	today := time.Now()
-	var day string = today.Format("2006-01-02")
+	day := time.Now().Format("2006-01-02")
 	var code string = "CHF"
 	var table string = "C"
 
@@ -350,8 +348,7 @@ func TestGetRateCurrentB(t *testing.T) {
 }
 
 func TestGetRateToday(t *testing.T) {
-	today := time.Now()
-	var day string = today.Format("2006-01-02")
+	day := time.Now().Format("2006-01-02")
 	var code string = "CHF"
 	var table string = "C"
 
