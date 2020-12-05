@@ -373,15 +373,47 @@ func (t *NBPTable) GetPrettyOutput(lang string) string
 func (t *NBPTable) GetRawOutput() string
     GetRawOutput - function returns just result of request (json or xml)
 
+func (t *NBPTable) GetTableByDate(date string) ([]ExchangeTable, error)
+    GetTableByDate - function retrieves a table of exchange rates for a given
+    day and return slice of struct ExchangeTable (or error). Version for table
+    A, B (mid - average price)
+
+    Parameters:
+
+        date - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
+        or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
+        (rate for today) or 'current' - current table / rate (last published)
+
+func (t *NBPTable) GetTableCByDate(date string) ([]ExchangeTableC, error)
+    GetTableCByDate - function retrieves a table of exchange rates for a given
+    day and return slice of struct ExchangeTable (or error). Version for table C
+    (ask, bid - buy, sell prices)
+
+    Parameters:
+
+        date - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
+        or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
+        (rate for today) or 'current' - current table / rate (last published)
+
 func (t *NBPTable) GetTableCCurrent() ([]ExchangeTableC, error)
     GetTableCCurrent - function downloads current table of currency exchange
     rates and return slice of struct ExchangeTableC (or error), version for
     table C (bid, ask - buy, sell prices)
 
+func (t *NBPTable) GetTableCToday() ([]ExchangeTableC, error)
+    GetTableCToday - function downloads today's table of currency exchange rates
+    and return slice of struct ExchangeTableC (or error), version for table C
+    (bid, ask - buy, sell prices)
+
 func (t *NBPTable) GetTableCurrent() ([]ExchangeTable, error)
     GetTableCurrent - function downloads current table of currency exchange
     rates and return slice of struct ExchangeTable (or error), version for table
     A, B (mid - average price)
+
+func (t *NBPTable) GetTableToday() ([]ExchangeTable, error)
+    GetTableToday - function downloads today's table of currency exchange rates
+    and return slice of struct ExchangeTable (or error), version for table A, B
+    (mid - average price)
 
 func (t *NBPTable) TableByDate(date string) error
     TableByDate - function downloads and writes data to NBPTable.Exchange

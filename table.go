@@ -4,7 +4,7 @@
 // types: NBPTable, ExchangeTable, ExchangeTableC
 // NBPTable methods:
 //			TableRaw, TableByDate, TableLast
-//          GetTableCurrent, GetTableCCurrent
+//          GetTableCurrent, GetTableCCurrent, GetTableToday, GetTableCToday, GetTableByDay, GetTableCByDay
 //			GetPrettyOutput, GetCSVOutput, GetRawOutput
 
 package nbpapi
@@ -167,6 +167,122 @@ func (t *NBPTable) GetTableCCurrent() ([]ExchangeTableC, error) {
 	}
 
 	url := getTableAddress(t.tableType, "current", 0)
+	t.result, err = t.getData(url, "json")
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(t.result, &t.ExchangeC)
+	if err != nil {
+		return nil, err
+	}
+
+	return t.ExchangeC, err
+}
+
+/*
+GetTableByDate - function retrieves a table of exchange rates for a given day
+and return slice of struct ExchangeTable (or error). Version for
+table A, B (mid - average price)
+
+Parameters:
+
+    date - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
+    or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
+    (rate for today) or 'current' - current table / rate (last published)
+*/
+func (t *NBPTable) GetTableByDate(date string) ([]ExchangeTable, error) {
+	var err error
+
+	if t.tableType == "C" {
+		return nil, errors.New("Invalid function call context, use GetTableCByDate")
+	}
+
+	url := getTableAddress(t.tableType, date, 0)
+	t.result, err = t.getData(url, "json")
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(t.result, &t.Exchange)
+	if err != nil {
+		return nil, err
+	}
+
+	return t.Exchange, err
+}
+
+/*
+GetTableCByDate - function retrieves a table of exchange rates for a given day
+and return slice of struct ExchangeTable (or error). Version for
+table C (ask, bid - buy, sell prices)
+
+Parameters:
+
+    date - date in the format: 'YYYY-MM-DD' (ISO 8601 standard),
+    or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
+    (rate for today) or 'current' - current table / rate (last published)
+*/
+func (t *NBPTable) GetTableCByDate(date string) ([]ExchangeTableC, error) {
+	var err error
+
+	if t.tableType != "C" {
+		return nil, errors.New("Invalid function call context, use GetTableByDate")
+	}
+
+	url := getTableAddress(t.tableType, date, 0)
+	t.result, err = t.getData(url, "json")
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(t.result, &t.ExchangeC)
+	if err != nil {
+		return nil, err
+	}
+
+	return t.ExchangeC, err
+}
+
+/*
+GetTableToday - function downloads today's table of currency exchange
+rates and return slice of struct ExchangeTable (or error), version for
+table A, B (mid - average price)
+*/
+func (t *NBPTable) GetTableToday() ([]ExchangeTable, error) {
+	var err error
+
+	if t.tableType == "C" {
+		return nil, errors.New("Invalid function call context, use GetTableCToday")
+	}
+
+	url := getTableAddress(t.tableType, "today", 0)
+	t.result, err = t.getData(url, "json")
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(t.result, &t.Exchange)
+	if err != nil {
+		return nil, err
+	}
+
+	return t.Exchange, err
+}
+
+/*
+GetTableCToday - function downloads today's table of currency exchange
+rates and return slice of struct ExchangeTableC (or error), version for
+table C (bid, ask - buy, sell prices)
+*/
+func (t *NBPTable) GetTableCToday() ([]ExchangeTableC, error) {
+	var err error
+
+	if t.tableType != "C" {
+		return nil, errors.New("Invalid function call context, use GetTableToday")
+	}
+
+	url := getTableAddress(t.tableType, "today", 0)
 	t.result, err = t.getData(url, "json")
 	if err != nil {
 		return nil, err
@@ -344,8 +460,7 @@ func queryTableDate(tableType string, date string) string {
 // queryTableRange - returns query: table of exchange rates  within
 // the given date range (RRRR-MM-DD:RRRR-MM-DD)
 func queryTableRange(tableType string, date string) string {
-	var startDate string
-	var stopDate string
+	var startDate, stopDate string
 
 	temp := strings.Split(date, ":")
 	startDate = temp[0]

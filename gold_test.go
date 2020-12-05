@@ -45,6 +45,23 @@ func TestGetGoldToday(t *testing.T) {
 	}
 }
 
+func TestGetGoldTodayFailedBecaueOfWeekend(t *testing.T) {
+	day := time.Now().Format("2006-01-02")
+	var err error
+
+	littleDelay()
+
+	apiClient := NewGold()
+
+	_, err = apiClient.GetPriceByDate(day)
+	if err != nil {
+		_, err := apiClient.GetPriceToday()
+		if err == nil {
+			t.Errorf("expected: err != nil, received: err == nil")
+		}
+	}
+}
+
 func TestGetGoldDay(t *testing.T) {
 	var day string = "2020-11-17"
 	var cena float64 = 229.03

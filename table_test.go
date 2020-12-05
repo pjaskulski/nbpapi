@@ -11,7 +11,6 @@ func TestTableByDateCurrent(t *testing.T) {
 	var table string = "A"
 
 	littleDelay()
-
 	client := NewTable(table)
 
 	err := client.TableByDate("current")
@@ -29,7 +28,6 @@ func TestTableByDate(t *testing.T) {
 	var tableNo string = "224/A/NBP/2020"
 
 	littleDelay()
-
 	client := NewTable(table)
 
 	err := client.TableByDate(day)
@@ -56,7 +54,6 @@ func TestTableByDateRange(t *testing.T) {
 	var day string = "2020-11-16:2020-11-17"
 
 	littleDelay()
-
 	client := NewTable(table)
 
 	err := client.TableByDate(day)
@@ -121,7 +118,6 @@ func TestTableByDateFailed(t *testing.T) {
 	var table string = "D"
 
 	littleDelay()
-
 	client := NewTable(table)
 
 	err := client.TableByDate("today")
@@ -178,6 +174,7 @@ func TestQueryTableRange(t *testing.T) {
 func TestTableCSVOutput(t *testing.T) {
 	want := "TABLE,CODE,NAME,AVERAGE (PLN)"
 
+	littleDelay()
 	client := NewTable("A")
 	err := client.TableByDate("current")
 	if err != nil {
@@ -192,6 +189,7 @@ func TestTableCSVOutput(t *testing.T) {
 func TestTableCCSVOutput(t *testing.T) {
 	want := "TABLE,CODE,NAME,BUY (PLN),SELL (PLN)"
 
+	littleDelay()
 	client := NewTable("C")
 	err := client.TableByDate("current")
 	if err != nil {
@@ -205,6 +203,7 @@ func TestTableCCSVOutput(t *testing.T) {
 }
 
 func TestTableRaw(t *testing.T) {
+	littleDelay()
 	client := NewTable("C")
 
 	err := client.TableRaw("2020-12-02", 0, "json")
@@ -217,6 +216,7 @@ func TestTableRaw(t *testing.T) {
 }
 
 func TestGetTableRawOutput(t *testing.T) {
+	littleDelay()
 	client := NewTable("C")
 
 	err := client.TableRaw("2020-12-02", 0, "json")
@@ -231,6 +231,8 @@ func TestGetTableRawOutput(t *testing.T) {
 }
 
 func TestGetTableCurrent(t *testing.T) {
+
+	littleDelay()
 	client := NewTable("A")
 	_, err := client.GetTableCurrent()
 	if err != nil {
@@ -239,6 +241,8 @@ func TestGetTableCurrent(t *testing.T) {
 }
 
 func TestGetTableCurrentFailed(t *testing.T) {
+
+	littleDelay()
 	client := NewTable("C")
 	_, err := client.GetTableCurrent()
 	if err == nil {
@@ -247,6 +251,8 @@ func TestGetTableCurrentFailed(t *testing.T) {
 }
 
 func TestGetTableCCurrent(t *testing.T) {
+
+	littleDelay()
 	client := NewTable("C")
 	_, err := client.GetTableCCurrent()
 	if err != nil {
@@ -254,9 +260,139 @@ func TestGetTableCCurrent(t *testing.T) {
 	}
 }
 
-func TestGetTableCCurrentFailed(t *testing.T) {
+func TestGetTableCCurrentFailedBecauseOfWrongType(t *testing.T) {
+	littleDelay()
 	client := NewTable("A")
+
 	_, err := client.GetTableCCurrent()
+	if err == nil {
+		t.Errorf("want: err != nil, got err == nil")
+	}
+}
+
+func TestGetTableToday(t *testing.T) {
+	day := time.Now().Format("2006-01-02")
+
+	littleDelay()
+	client := NewTable("A")
+
+	_, err := client.GetTableByDate(day) // test if table for today exists
+	if err == nil {
+		_, err := client.GetTableToday() // if it works for ..ByDay, should works for ..Today
+		if err != nil {
+			t.Errorf("want: err == nil, got err != nil")
+		}
+	}
+}
+
+func TestGetTableTodayShouldFailedBecauseOfWrongType(t *testing.T) {
+	littleDelay()
+	client := NewTable("C")
+
+	_, err := client.GetTableToday() // wrong func for C table type
+	if err == nil {
+		t.Errorf("want: err != nil, got err == nil")
+	}
+}
+
+func TestGetTableTodayShouldFailedBecauseOfWeekend(t *testing.T) {
+	day := time.Now().Format("2006-01-02")
+
+	littleDelay()
+	client := NewTable("A")
+
+	_, err := client.GetTableByDate(day)
+	if err != nil {
+		_, err := client.GetTableToday()
+		if err == nil {
+			t.Errorf("want: err != nil, got err == nil")
+		}
+	}
+}
+
+func TestGetTableCToday(t *testing.T) {
+	day := time.Now().Format("2006-01-02")
+
+	littleDelay()
+	client := NewTable("C")
+
+	_, err := client.GetTableCByDate(day) // test if table for today exists
+	if err == nil {
+		_, err := client.GetTableCToday() // if it works for ..ByDay, should works for ..Today
+		if err != nil {
+			t.Errorf("want: err == nil, got err != nil")
+		}
+	}
+}
+
+func TestGetTableTodayCFailedBecauseOfWrongType(t *testing.T) {
+	littleDelay()
+	client := NewTable("A")
+
+	_, err := client.GetTableCToday() // wrong func for A table type
+	if err == nil {
+		t.Errorf("want: err != nil, got err == nil")
+	}
+}
+
+func TestGetTableCTodayShouldFailedBecauseOfWeekend(t *testing.T) {
+	day := time.Now().Format("2006-01-02")
+
+	littleDelay()
+	client := NewTable("C")
+
+	_, err := client.GetTableCByDate(day)
+	if err != nil {
+		_, err := client.GetTableCToday()
+		if err == nil {
+			t.Errorf("want: err != nil, got err == nil")
+		}
+	}
+}
+
+func TestGetTableByDate(t *testing.T) {
+	day := "2020-11-12"
+
+	littleDelay()
+	client := NewTable("A")
+
+	_, err := client.GetTableByDate(day)
+	if err != nil {
+		t.Errorf("want: err == nil, got err != nil")
+	}
+}
+
+func TestGetTableByDateFailedBecauseOfWrongType(t *testing.T) {
+	day := "2020-11-12"
+
+	littleDelay()
+	client := NewTable("C")
+
+	_, err := client.GetTableByDate(day)
+	if err == nil {
+		t.Errorf("want: err != nil, got err == nil")
+	}
+}
+
+func TestGetTableCByDate(t *testing.T) {
+	day := "2020-11-12"
+
+	littleDelay()
+	client := NewTable("C")
+
+	_, err := client.GetTableCByDate(day)
+	if err != nil {
+		t.Errorf("want: err == nil, got err != nil")
+	}
+}
+
+func TestGetTableCByDateFailedBecauseOfWrongType(t *testing.T) {
+	day := "2020-11-12"
+
+	littleDelay()
+	client := NewTable("A")
+
+	_, err := client.GetTableCByDate(day)
 	if err == nil {
 		t.Errorf("want: err != nil, got err == nil")
 	}
@@ -264,6 +400,7 @@ func TestGetTableCCurrentFailed(t *testing.T) {
 
 func TestTablePrettyOutput(t *testing.T) {
 
+	littleDelay()
 	client := NewTable("A")
 	err := client.TableByDate("current")
 	if err != nil {
@@ -288,6 +425,7 @@ func TestTablePrettyOutput(t *testing.T) {
 
 func TestTableCPrettyOutput(t *testing.T) {
 
+	littleDelay()
 	client := NewTable("C")
 	err := client.TableByDate("current")
 	if err != nil {
@@ -316,7 +454,6 @@ func TestTableCByDate(t *testing.T) {
 	var tableNo string = "224/C/NBP/2020"
 
 	littleDelay()
-
 	client := NewTable(table)
 
 	err := client.TableByDate(day)

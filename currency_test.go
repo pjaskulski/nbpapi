@@ -71,6 +71,32 @@ func TestGetCurrencyDay(t *testing.T) {
 	}
 }
 
+func TestGetCurrencyDayTableC(t *testing.T) {
+	var table string = "C"
+	var currency string = "CHF"
+	var day string = "2020-11-13" // Friday 13 Nov 2020, CHF ask (sell) = 4.1980
+
+	littleDelay()
+	client := NewCurrency(table)
+
+	err := client.CurrencyByDate(currency, day)
+	if err != nil {
+		t.Errorf("expected: err == nil, received: err != nil")
+	}
+
+	if !json.Valid(client.result) {
+		t.Errorf("incorrect json content was received")
+	}
+
+	if client.ExchangeC.Rates[0].EffectiveDate != day {
+		t.Errorf("incorect effectiveDate, want: %s, got %s", day, client.ExchangeC.Rates[0].EffectiveDate)
+	}
+
+	if client.ExchangeC.Rates[0].Ask != 4.1980 {
+		t.Errorf("incorrect data, the CHF exchange rate on 2020-11-13 was 4.1980, not %.4f", client.ExchangeC.Rates[0].Ask)
+	}
+}
+
 func TestGetCurrencyDaySaturdayFailed(t *testing.T) {
 	var table string = "A"
 	var currency string = "CHF"
@@ -100,6 +126,23 @@ func TestGetCurrencyLast(t *testing.T) {
 	}
 	if len(client.Exchange.Rates) != 5 {
 		t.Errorf("want: %d, got: %d", last, len(client.Exchange.Rates))
+	}
+}
+
+func TestGetCurrencyLastTableC(t *testing.T) {
+	var table string = "C"
+	var currency string = "CHF"
+	var last int = 5
+
+	littleDelay()
+	client := NewCurrency(table)
+
+	err := client.CurrencyLast(currency, last)
+	if err != nil {
+		t.Errorf("expected: err == nil, received: err != nil")
+	}
+	if len(client.ExchangeC.Rates) != 5 {
+		t.Errorf("want: %d, got: %d", last, len(client.ExchangeC.Rates))
 	}
 }
 
@@ -290,6 +333,19 @@ func TestGetRateCurrent(t *testing.T) {
 
 	if result.Ask == 0 && result.Bid == 0 {
 		t.Errorf("want ask and bid != 0, got: %.4f and %.4f", result.Ask, result.Bid)
+	}
+}
+
+func TestGetRateCurrentB(t *testing.T) {
+	client := NewCurrency("B")
+
+	result, err := client.GetRateCurrent("ETB")
+	if err != nil {
+		t.Errorf("want: err == nil, got: err != nil")
+	}
+
+	if result.Mid == 0 {
+		t.Errorf("want average price != 0, got: %.4f", result.Mid)
 	}
 }
 
