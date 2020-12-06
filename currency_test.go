@@ -71,6 +71,20 @@ func TestGetCurrencyDay(t *testing.T) {
 	}
 }
 
+func TestGetCurrencyDayShouldFailOfInvalidCurrencyCode(t *testing.T) {
+	var table string = "A"
+	var currency string = "AOA" // currency code valid for B table, not A
+	var day string = "2020-11-13"
+
+	littleDelay()
+	client := NewCurrency(table)
+
+	err := client.CurrencyByDate(currency, day)
+	if err != ErrInvalidCurrencyCode {
+		t.Errorf("expected: err == ErrInvalidCurrencyCode")
+	}
+}
+
 func TestGetCurrencyDayTableC(t *testing.T) {
 	var table string = "C"
 	var currency string = "CHF"

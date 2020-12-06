@@ -53,6 +53,11 @@ Parameters:
 func (c *NBPCurrency) CurrencyRaw(code, date string, last int, format string) error {
 	var err error
 
+	err = checkCurrencyCode(c.tableType, code)
+	if err != nil {
+		return err
+	}
+
 	url := c.getCurrencyAddress(c.tableType, date, last, code)
 	c.result, err = c.getData(url, format)
 	if err != nil {
@@ -79,6 +84,11 @@ Parameters:
 */
 func (c *NBPCurrency) CurrencyByDate(code, date string) error {
 	var err error
+
+	err = checkCurrencyCode(c.tableType, code)
+	if err != nil {
+		return err
+	}
 
 	url := c.getCurrencyAddress(c.tableType, date, 0, code)
 	c.result, err = c.getData(url, "json")
@@ -115,6 +125,11 @@ Parameters:
 func (c *NBPCurrency) CurrencyLast(code string, last int) error {
 	var err error
 
+	err = checkCurrencyCode(c.tableType, code)
+	if err != nil {
+		return err
+	}
+
 	url := c.getCurrencyAddress(c.tableType, "", last, code)
 	c.result, err = c.getData(url, "json")
 	if err != nil {
@@ -147,6 +162,11 @@ Parameters:
 func (c *NBPCurrency) CurrencyToday(code string) error {
 	var err error
 
+	err = checkCurrencyCode(c.tableType, code)
+	if err != nil {
+		return err
+	}
+
 	url := c.getCurrencyAddress(c.tableType, "today", 0, code)
 	c.result, err = c.getData(url, "json")
 	if err != nil {
@@ -177,6 +197,11 @@ Parameters:
 func (c *NBPCurrency) GetRateCurrent(code string) (Rate, error) {
 	var err error
 	var rate Rate
+
+	err = checkCurrencyCode(c.tableType, code)
+	if err != nil {
+		return rate, err
+	}
 
 	url := c.getCurrencyAddress(c.tableType, "current", 0, code)
 	c.result, err = c.getData(url, "json")
@@ -222,6 +247,11 @@ Parameters:
 func (c *NBPCurrency) GetRateToday(code string) (Rate, error) {
 	var err error
 	var rate Rate
+
+	err = checkCurrencyCode(c.tableType, code)
+	if err != nil {
+		return rate, err
+	}
 
 	url := c.getCurrencyAddress(c.tableType, "today", 0, code)
 	c.result, err = c.getData(url, "json")
@@ -272,6 +302,11 @@ func (c *NBPCurrency) GetRateByDate(code, date string) ([]Rate, error) {
 	var err error
 	var rates []Rate
 	var rate Rate
+
+	err = checkCurrencyCode(c.tableType, code)
+	if err != nil {
+		return nil, err
+	}
 
 	url := c.getCurrencyAddress(c.tableType, date, 0, code)
 	c.result, err = c.getData(url, "json")
