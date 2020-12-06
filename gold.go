@@ -251,7 +251,7 @@ func (g *NBPGold) GetRawOutput() string {
    url - NBP web api address
    format - 'json' or 'xml'
 */
-func (g *NBPGold) getData(url string, format string) ([]byte, error) {
+func (g *NBPGold) getData(url, format string) ([]byte, error) {
 	return fetchData(g.Client, url, format)
 }
 

@@ -414,7 +414,7 @@ func (t *NBPTable) GetRawOutput() string {
    url - NBP web api address
    format - 'json' or 'xml'
 */
-func (t *NBPTable) getData(url string, format string) ([]byte, error) {
+func (t *NBPTable) getData(url, format string) ([]byte, error) {
 	return fetchData(t.Client, url, format)
 }
 
@@ -422,7 +422,7 @@ func (t *NBPTable) getData(url string, format string) ([]byte, error) {
 
 // getTableAddress - build download address depending on previously
 // verified input parameters (--table, --date or --last)
-func getTableAddress(tableType string, date string, last int) string {
+func getTableAddress(tableType, date string, last int) string {
 	var address string
 
 	if last != 0 {
@@ -453,13 +453,13 @@ func queryTableCurrent(tableType string) string {
 
 // queryTableDay - returns query: table of exchange rates
 // on the given date (YYYY-MM-DD)
-func queryTableDate(tableType string, date string) string {
+func queryTableDate(tableType, date string) string {
 	return fmt.Sprintf("%s/tables/%s/%s/", baseAddressTable, tableType, date)
 }
 
 // queryTableRange - returns query: table of exchange rates  within
 // the given date range (RRRR-MM-DD:RRRR-MM-DD)
-func queryTableRange(tableType string, date string) string {
+func queryTableRange(tableType, date string) string {
 	var startDate, stopDate string
 
 	temp := strings.Split(date, ":")
@@ -471,6 +471,6 @@ func queryTableRange(tableType string, date string) string {
 }
 
 // queryTableLast - returns query: last <number> tables of exchange rates
-func queryTableLast(tableType string, last string) string {
+func queryTableLast(tableType, last string) string {
 	return fmt.Sprintf("%s/tables/%s/last/%s/", baseAddressTable, tableType, last)
 }

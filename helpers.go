@@ -14,7 +14,7 @@ func littleDelay() {
 }
 
 // randomInteger func
-func randomInteger(minValue int, maxValue int) int {
+func randomInteger(minValue, maxValue int) int {
 	var result int
 
 	rand.Seed(time.Now().UnixNano())

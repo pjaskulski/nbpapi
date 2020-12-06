@@ -50,7 +50,7 @@ Parameters:
 
     format - 'json' or 'xml'
 */
-func (c *NBPCurrency) CurrencyRaw(code string, date string, last int, format string) error {
+func (c *NBPCurrency) CurrencyRaw(code, date string, last int, format string) error {
 	var err error
 
 	url := c.getCurrencyAddress(c.tableType, date, last, code)
@@ -77,7 +77,7 @@ Parameters:
     code - ISO 4217 currency code, depending on the type of the
     table available currencies may vary
 */
-func (c *NBPCurrency) CurrencyByDate(code string, date string) error {
+func (c *NBPCurrency) CurrencyByDate(code, date string) error {
 	var err error
 
 	url := c.getCurrencyAddress(c.tableType, date, 0, code)
@@ -268,7 +268,7 @@ Parameters:
     or a range of dates in the format: 'YYYY-MM-DD:YYYY-MM-DD' or 'today'
     (rate for today) or 'current' - current table / rate (last published)
 */
-func (c *NBPCurrency) GetRateByDate(code string, date string) ([]Rate, error) {
+func (c *NBPCurrency) GetRateByDate(code, date string) ([]Rate, error) {
 	var err error
 	var rates []Rate
 	var rate Rate
@@ -410,7 +410,7 @@ func (c *NBPCurrency) GetRawOutput() string {
    url - NBP web api address
    format - 'json' or 'xml'
 */
-func (c *NBPCurrency) getData(url string, format string) ([]byte, error) {
+func (c *NBPCurrency) getData(url, format string) ([]byte, error) {
 	return fetchData(c.Client, url, format)
 }
 
@@ -418,7 +418,7 @@ func (c *NBPCurrency) getData(url string, format string) ([]byte, error) {
 
 // getCurrencyAddress - function builds download address depending on previously
 // verified input parameters (--table, --date or --last, --code)
-func (c *NBPCurrency) getCurrencyAddress(tableType string, date string, last int, code string) string {
+func (c *NBPCurrency) getCurrencyAddress(tableType, date string, last int, code string) string {
 	var address string
 
 	if last != 0 {
@@ -438,31 +438,31 @@ func (c *NBPCurrency) getCurrencyAddress(tableType string, date string, last int
 
 // queryCurrencyLast - returns query: last <number> currency exchange
 // rates in json/xml form, or error
-func queryCurrencyLast(tableType string, last string, currency string) string {
+func queryCurrencyLast(tableType, last, currency string) string {
 	return fmt.Sprintf("%s/rates/%s/%s/last/%s/", baseAddressCurrency, tableType, currency, last)
 
 }
 
 // queryCurrencyToday - returns query: today's currency exchange rate
-func queryCurrencyToday(tableType string, currency string) string {
+func queryCurrencyToday(tableType, currency string) string {
 	return fmt.Sprintf("%s/rates/%s/%s/today/", baseAddressCurrency, tableType, currency)
 }
 
 // queryCurrencyCurrent - returns query: current exchange rate for
 // particular currency (last published price)
-func queryCurrencyCurrent(tableType string, currency string) string {
+func queryCurrencyCurrent(tableType, currency string) string {
 	return fmt.Sprintf("%s/rates/%s/%s/", baseAddressCurrency, tableType, currency)
 }
 
 // queryCurrencyDay - returns query: exchange rate for particular currency
 // on the given date (YYYY-MM-DD)
-func queryCurrencyDate(tableType string, date string, currency string) string {
+func queryCurrencyDate(tableType, date, currency string) string {
 	return fmt.Sprintf("%s/rates/%s/%s/%s/", baseAddressCurrency, tableType, currency, date)
 }
 
 // queryCurrencyRange - returns query: exchange rate for particular currency
 // within the given date range (RRRR-MM-DD:RRRR-MM-DD)
-func queryCurrencyRange(tableType string, date string, currency string) string {
+func queryCurrencyRange(tableType, date, currency string) string {
 	var startDate string
 	var stopDate string
 

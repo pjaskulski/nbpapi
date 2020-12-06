@@ -29,7 +29,7 @@ func setLang(lang string) {
    url - NBP web api address
    format - 'json' or 'xml'
 */
-func fetchData(client *http.Client, url string, format string) ([]byte, error) {
+func fetchData(client *http.Client, url, format string) ([]byte, error) {
 	if format == "json" {
 		format = "application/json"
 	} else if format == "xml" {
