@@ -14,13 +14,13 @@ func main() {
 		How to get a latest 5 exchange rates of currency CHF,
 		table of type A (mid - average exchange rate)
 	*/
-	nbpMid := nbpapi.NewCurrency("A")
-	err := nbpMid.CurrencyLast("CHF", 5)
+	client := nbpapi.NewCurrency("A")
+	err := client.CurrencyLast("CHF", 5)
 	if err != nil {
 		fmt.Println(err)
 	} else {
 		// print polish version
-		fmt.Println(nbpMid.GetPrettyOutput("pl"))
+		fmt.Println(client.GetPrettyOutput("pl"))
 		fmt.Println()
 	}
 	fmt.Println()

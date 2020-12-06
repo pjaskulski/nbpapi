@@ -13,6 +13,9 @@ const (
 	baseAddressGold     string = "http://api.nbp.pl/api/cenyzlota"
 )
 
+// TableValues - list of table types
+var TableValues = []string{"A", "B", "C"}
+
 // CurrencyValuesA - list of supported currencies for table type A
 var CurrencyValuesA = []string{"THB", "USD", "AUD", "HKD", "CAD", "NZD", "SGD", "EUR", "HUF", "CHF",
 	"GBP", "UAH", "JPY", "CZK", "DKK", "ISK", "NOK", "SEK", "HRK", "RON",

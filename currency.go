@@ -438,6 +438,15 @@ func (c *NBPCurrency) GetRawOutput() string {
 	return string(c.result)
 }
 
+// SetTableType - the function allows to set the supported type of exchange rate table
+func (c *NBPCurrency) SetTableType(tableType string) error {
+	err := checkTableType(tableType)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 /* getData - function that retrieves data from the NBP website
    and returns them in the form of JSON / XML (or error), based on
    the arguments provided:

@@ -8,7 +8,11 @@ import (
 	"time"
 )
 
-var ErrInvalidCurrencyCode error = errors.New("Invalid currency code")
+// errors for invalid code, table type
+var (
+	ErrInvalidCurrencyCode error = errors.New("Invalid currency code")
+	ErrInvalidTableType    error = errors.New("Invalid table type, allowed values: A, B or C")
+)
 
 // littleDelay - delay function, so as not to bother the NBP server too much...
 func littleDelay() {
@@ -36,6 +40,7 @@ func inSlice(slice []string, val string) bool {
 	return false
 }
 
+// checkCurrencyCode - function checks if currency code is allowed for specified table type
 func checkCurrencyCode(tableType, code string) error {
 	switch tableType {
 	case "A":
@@ -50,6 +55,14 @@ func checkCurrencyCode(tableType, code string) error {
 		if !inSlice(CurrencyValuesC, code) {
 			return ErrInvalidCurrencyCode
 		}
+	}
+	return nil
+}
+
+// checkTableType - function chcek if table type is allowed
+func checkTableType(tableType string) error {
+	if !inSlice(TableValues, tableType) {
+		return ErrInvalidTableType
 	}
 	return nil
 }
