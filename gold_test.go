@@ -5,11 +5,31 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/jarcoal/httpmock"
 )
+
+func init() {
+
+	if !useMock {
+		return
+	}
+
+}
 
 // low level getData tests
 func TestGetGoldCurrent(t *testing.T) {
-	littleDelay()
+
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		today := time.Now().Format("2006-01-01")
+		httpmock.RegisterResponder("GET", "http://api.nbp.pl/api/cenyzlota",
+			httpmock.NewStringResponder(200, `[{"data":"`+today+`","cena":717.83}]`))
+	} else {
+		littleDelay() // delay if use real NBP API service
+	}
 
 	apiClient := NewGold()
 	result, err := apiClient.GetPriceCurrent()
@@ -28,15 +48,32 @@ func TestGetGoldCurrent(t *testing.T) {
 }
 
 func TestGetGoldToday(t *testing.T) {
-	today := time.Now()
-	var day string = today.Format("2006-01-02")
+	today := time.Now().Format("2006-01-02")
 	var err error
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		weekday := time.Now().Weekday()
+		if weekday == time.Saturday || weekday == time.Sunday {
+			httpmock.RegisterResponder("GET", "http://api.nbp.pl/api/cenyzlota/today/",
+				httpmock.NewStringResponder(404, `404 NotFound - Not Found - Brak danych`))
+
+			httpmock.RegisterResponder("GET", "http://api.nbp.pl/api/cenyzlota/"+today+"/",
+				httpmock.NewStringResponder(404, `404 NotFound - Not Found - Brak danych`))
+		} else {
+			httpmock.RegisterResponder("GET", "http://api.nbp.pl/api/cenyzlota/today/",
+				httpmock.NewStringResponder(200, `[{"data":"`+today+`","cena":717.83}]`))
+			httpmock.RegisterResponder("GET", "http://api.nbp.pl/api/cenyzlota/"+today+"/",
+				httpmock.NewStringResponder(200, `[{"data":"`+today+`","cena":717.83}]`))
+		}
+	} else {
+		littleDelay() // delay if use real NBP API service
+	}
 
 	apiClient := NewGold()
-
-	_, err = apiClient.GetPriceByDate(day)
+	_, err = apiClient.GetPriceByDate(today)
 	if err == nil {
 		_, err := apiClient.GetPriceToday()
 		if err != nil {
@@ -46,14 +83,33 @@ func TestGetGoldToday(t *testing.T) {
 }
 
 func TestGetGoldTodayFailedBecaueOfWeekend(t *testing.T) {
-	day := time.Now().Format("2006-01-02")
+	today := time.Now().Format("2006-01-02")
 	var err error
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		weekday := time.Now().Weekday()
+		if weekday == time.Saturday || weekday == time.Sunday {
+			httpmock.RegisterResponder("GET", "http://api.nbp.pl/api/cenyzlota/today/",
+				httpmock.NewStringResponder(404, `404 NotFound - Not Found - Brak danych`))
+
+			httpmock.RegisterResponder("GET", "http://api.nbp.pl/api/cenyzlota/"+today+"/",
+				httpmock.NewStringResponder(404, `404 NotFound - Not Found - Brak danych`))
+		} else {
+			httpmock.RegisterResponder("GET", "http://api.nbp.pl/api/cenyzlota/today/",
+				httpmock.NewStringResponder(200, `[{"data":"`+today+`","cena":717.83}]`))
+			httpmock.RegisterResponder("GET", "http://api.nbp.pl/api/cenyzlota/"+today+"/",
+				httpmock.NewStringResponder(200, `[{"data":"`+today+`","cena":717.83}]`))
+		}
+	} else {
+		littleDelay() // delay if use real NBP API service
+	}
 
 	apiClient := NewGold()
 
-	_, err = apiClient.GetPriceByDate(day)
+	_, err = apiClient.GetPriceByDate(today)
 	if err != nil {
 		_, err := apiClient.GetPriceToday()
 		if err == nil {
