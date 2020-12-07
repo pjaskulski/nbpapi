@@ -440,11 +440,22 @@ func TestGetGoldAddress(t *testing.T) {
 	}
 }
 
-func TestGoldGetCSVOutput(t *testing.T) {
+func TestGoldGetCSVOutputShouldReturnCSVData(t *testing.T) {
 	var err error
 	var result string
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		var mockResponse string
+		mockResponse = `[{"data":"2020-12-01","cena":211.74}]`
+
+		httpmock.RegisterResponder("GET", baseAddressGold,
+			httpmock.NewStringResponder(200, mockResponse))
+	} else {
+		littleDelay()
+	}
 
 	apiClient := NewGold()
 	err = apiClient.GoldByDate("current")
@@ -464,11 +475,22 @@ func TestGoldGetCSVOutput(t *testing.T) {
 	}
 }
 
-func TestGoldGetPrettyOutput(t *testing.T) {
+func TestGoldGetPrettyOutputShouldReturnPrettyText(t *testing.T) {
 	var err error
 	var result string
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		var mockResponse string
+		mockResponse = `[{"data":"2020-12-01","cena":211.74}]`
+
+		httpmock.RegisterResponder("GET", baseAddressGold,
+			httpmock.NewStringResponder(200, mockResponse))
+	} else {
+		littleDelay()
+	}
 
 	apiClient := NewGold()
 	err = apiClient.GoldByDate("current")
@@ -554,6 +576,19 @@ func TestGoldGetDataFailed(t *testing.T) {
 }
 
 func TestGoldRaw(t *testing.T) {
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		var mockResponse string
+		mockResponse = `[{"data":"2020-12-02","cena":211.74}]`
+
+		httpmock.RegisterResponder("GET", baseAddressGold+"/2020-12-02",
+			httpmock.NewStringResponder(200, mockResponse))
+	} else {
+		littleDelay()
+	}
+
 	client := NewGold()
 
 	err := client.GoldRaw("2020-12-02", 0, "json")
@@ -566,6 +601,19 @@ func TestGoldRaw(t *testing.T) {
 }
 
 func TestGoldRawOutput(t *testing.T) {
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		var mockResponse string
+		mockResponse = `[{"data":"2020-12-02","cena":211.74}]`
+
+		httpmock.RegisterResponder("GET", baseAddressGold+"/last/1",
+			httpmock.NewStringResponder(200, mockResponse))
+	} else {
+		littleDelay()
+	}
+
 	client := NewGold()
 
 	err := client.GoldLast(1)
