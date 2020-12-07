@@ -29,7 +29,7 @@ make test
 make cover
 ```
 
-Warning: by default some tests use (great) [httpmock](https://github.com/jarcoal/httpmock) library, to use the real NBP API service it is necessary to set the USEMOCK environment variable to '0'
+Warning: by default some tests use (great) [httpmock](https://github.com/jarcoal/httpmock) library, to use the real NBP API service it is necessary to set the `USEMOCK` environment variable to `'0'`
 
 ## Examples:
     

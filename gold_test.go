@@ -49,15 +49,15 @@ func TestGetGoldToday(t *testing.T) {
 
 		weekday := time.Now().Weekday()
 		if weekday == time.Saturday || weekday == time.Sunday {
-			httpmock.RegisterResponder("GET", baseAddressGold+"/today/",
+			httpmock.RegisterResponder("GET", baseAddressGold+"/today",
 				httpmock.NewStringResponder(404, `404 NotFound - Not Found - Brak danych`))
 
-			httpmock.RegisterResponder("GET", baseAddressGold+"/"+today+"/",
+			httpmock.RegisterResponder("GET", baseAddressGold+"/"+today,
 				httpmock.NewStringResponder(404, `404 NotFound - Not Found - Brak danych`))
 		} else {
-			httpmock.RegisterResponder("GET", baseAddressGold+"/today/",
+			httpmock.RegisterResponder("GET", baseAddressGold+"/today",
 				httpmock.NewStringResponder(200, `[{"data":"`+today+`","cena":717.83}]`))
-			httpmock.RegisterResponder("GET", baseAddressGold+"/"+today+"/",
+			httpmock.RegisterResponder("GET", baseAddressGold+"/"+today,
 				httpmock.NewStringResponder(200, `[{"data":"`+today+`","cena":717.83}]`))
 		}
 	} else {
@@ -84,15 +84,15 @@ func TestGetGoldTodayFailedBecaueOfWeekend(t *testing.T) {
 
 		weekday := time.Now().Weekday()
 		if weekday == time.Saturday || weekday == time.Sunday {
-			httpmock.RegisterResponder("GET", baseAddressGold+"/today/",
+			httpmock.RegisterResponder("GET", baseAddressGold+"/today",
 				httpmock.NewStringResponder(404, `404 NotFound - Not Found - Brak danych`))
 
-			httpmock.RegisterResponder("GET", baseAddressGold+"/"+today+"/",
+			httpmock.RegisterResponder("GET", baseAddressGold+"/"+today,
 				httpmock.NewStringResponder(404, `404 NotFound - Not Found - Brak danych`))
 		} else {
-			httpmock.RegisterResponder("GET", baseAddressGold+"/today/",
+			httpmock.RegisterResponder("GET", baseAddressGold+"/today",
 				httpmock.NewStringResponder(200, `[{"data":"`+today+`","cena":717.83}]`))
-			httpmock.RegisterResponder("GET", baseAddressGold+"/"+today+"/",
+			httpmock.RegisterResponder("GET", baseAddressGold+"/"+today,
 				httpmock.NewStringResponder(200, `[{"data":"`+today+`","cena":717.83}]`))
 		}
 	} else {
@@ -118,7 +118,7 @@ func TestGetGoldDay(t *testing.T) {
 		httpmock.Activate()
 		defer httpmock.DeactivateAndReset()
 
-		httpmock.RegisterResponder("GET", baseAddressGold+"/"+day+"/",
+		httpmock.RegisterResponder("GET", baseAddressGold+"/"+day,
 			httpmock.NewStringResponder(200, `[{"data":"`+day+`","cena":229.03}]`))
 	} else {
 		littleDelay()
@@ -149,7 +149,7 @@ func TestGetGoldDayFailed(t *testing.T) {
 		httpmock.Activate()
 		defer httpmock.DeactivateAndReset()
 
-		httpmock.RegisterResponder("GET", baseAddressGold+"/"+day+"/",
+		httpmock.RegisterResponder("GET", baseAddressGold+"/"+day,
 			httpmock.NewStringResponder(404, `404 NotFound - Not Found - Brak danych`))
 	} else {
 		littleDelay()
@@ -236,14 +236,23 @@ func TestGetGoldRange(t *testing.T) {
 	}
 }
 
-// NBPGold methods test
-
 func TestShouldGetGoldByDateSuccess(t *testing.T) {
 	var result []GoldRate
 	date := "2020-12-01"
 	expected := 211.7400 // the real price of gold on December 12, 2020 was PLN 211.7400
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		var mockResponse string
+		mockResponse = `[{"data":"2020-12-01","cena":211.74}]`
+
+		httpmock.RegisterResponder("GET", baseAddressGold+"/"+date,
+			httpmock.NewStringResponder(200, mockResponse))
+	} else {
+		littleDelay()
+	}
 
 	apiClient := NewGold()
 	result, err := apiClient.GetPriceByDate(date)
@@ -263,7 +272,18 @@ func TestShouldGetGoldCurrentSuccess(t *testing.T) {
 	var result []GoldRate
 	date := "current"
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		var mockResponse string
+		mockResponse = `[{"data":"2020-12-01","cena":211.74}]`
+
+		httpmock.RegisterResponder("GET", baseAddressGold,
+			httpmock.NewStringResponder(200, mockResponse))
+	} else {
+		littleDelay()
+	}
 
 	apiClient := NewGold()
 	result, err := apiClient.GetPriceByDate(date)
@@ -278,14 +298,31 @@ func TestShouldGetGoldCurrentSuccess(t *testing.T) {
 
 func TestGetPriceToday(t *testing.T) {
 	var err error
+	today := time.Now().Format("2006-01-02")
 
-	today := time.Now()
-	var date string = today.Format("2006-01-02")
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
 
-	littleDelay()
+		weekday := time.Now().Weekday()
+		if weekday == time.Saturday || weekday == time.Sunday {
+			httpmock.RegisterResponder("GET", baseAddressGold+"/today",
+				httpmock.NewStringResponder(404, `404 NotFound - Not Found - Brak danych`))
+
+			httpmock.RegisterResponder("GET", baseAddressGold+"/"+today,
+				httpmock.NewStringResponder(404, `404 NotFound - Not Found - Brak danych`))
+		} else {
+			httpmock.RegisterResponder("GET", baseAddressGold+"/today",
+				httpmock.NewStringResponder(200, `[{"data":"`+today+`","cena":717.83}]`))
+			httpmock.RegisterResponder("GET", baseAddressGold+"/"+today,
+				httpmock.NewStringResponder(200, `[{"data":"`+today+`","cena":717.83}]`))
+		}
+	} else {
+		littleDelay()
+	}
 
 	apiClient := NewGold()
-	_, err = apiClient.GetPriceByDate(date)
+	_, err = apiClient.GetPriceByDate(today)
 	if err == nil {
 		_, err := apiClient.GetPriceToday()
 		if err != nil {
@@ -298,7 +335,18 @@ func TestGetPriceCurrentShouldReturnNonZeroPrice(t *testing.T) {
 	var err error
 	var result GoldRate
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		var mockResponse string
+		mockResponse = `[{"data":"2020-12-01","cena":211.74}]`
+
+		httpmock.RegisterResponder("GET", baseAddressGold,
+			httpmock.NewStringResponder(200, mockResponse))
+	} else {
+		littleDelay()
+	}
 
 	apiClient := NewGold()
 	result, err = apiClient.GetPriceCurrent()

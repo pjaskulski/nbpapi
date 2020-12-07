@@ -279,7 +279,7 @@ func (g *NBPGold) getGoldAddress(date string, last int) string {
 
 // queryGoldToday - returns query: today's gold price
 func queryGoldToday() string {
-	return fmt.Sprintf("%s/today/", baseAddressGold)
+	return fmt.Sprintf("%s/today", baseAddressGold)
 }
 
 // queryGoldCurrent - returns query: current gold price
@@ -296,7 +296,7 @@ func queryGoldLast(last string) string {
 // queryGoldDay - function returns gold price on the given date (RRRR-MM-DD)
 // in json/xml form, or error
 func queryGoldDate(date string) string {
-	return fmt.Sprintf("%s/%s/", baseAddressGold, date)
+	return fmt.Sprintf("%s/%s", baseAddressGold, date)
 }
 
 // queryGoldRange - returns query: gold prices within the given date range
