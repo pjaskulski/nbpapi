@@ -17,7 +17,7 @@ To install and use:
 go get https://github.com/pjaskulski/nbpapi
 ```
 
-To clone and invoke the tests:
+To clone the repo and invoke the tests:
 
 ```bash
 git clone https://github.com/pjaskulski/nbpapi

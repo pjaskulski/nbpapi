@@ -2,9 +2,12 @@ package nbpapi
 
 import (
 	"encoding/json"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/jarcoal/httpmock"
 )
 
 func TestGetCurrencyCurrent(t *testing.T) {
@@ -12,7 +15,20 @@ func TestGetCurrencyCurrent(t *testing.T) {
 	var currency string = "CHF"
 	var currencyName string = "frank szwajcarski"
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		var mockResponse string
+		mockResponse = `{"table":"A","currency":"frank szwajcarski","code":"CHF","rates":`
+		mockResponse += `[{"no":"238/A/NBP/2020","effectiveDate":"2020-12-07","mid":4.1417}]}`
+
+		httpmock.RegisterResponder("GET", baseAddressCurrency+"/rates/A/CHF/",
+			httpmock.NewStringResponder(200, mockResponse))
+	} else {
+		littleDelay()
+	}
+
 	client := NewCurrency(table)
 
 	err := client.CurrencyByDate(currency, "current")
@@ -35,7 +51,18 @@ func TestGetCurrencyCurrentXXX(t *testing.T) {
 	var table string = "A"
 	var currency string = "XXX" // invalid currency code
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		var mockResponse string
+		mockResponse = `404 NotFound - Not Found - Brak danych`
+
+		httpmock.RegisterResponder("GET", baseAddressCurrency+"/rates/A/XXX/",
+			httpmock.NewStringResponder(404, mockResponse))
+	} else {
+		littleDelay()
+	}
 
 	client := NewCurrency(table)
 
@@ -50,7 +77,20 @@ func TestGetCurrencyDay(t *testing.T) {
 	var currency string = "CHF"
 	var day string = "2020-11-13" // Friday 13 Nov 2020, CHF = 4.1605
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		var mockResponse string
+		mockResponse = `{"table":"A","currency":"frank szwajcarski","code":"CHF","rates":`
+		mockResponse += `[{"no":"222/A/NBP/2020","effectiveDate":"2020-11-13","mid":4.1605}]}`
+
+		httpmock.RegisterResponder("GET", baseAddressCurrency+"/rates/A/CHF/"+day+"/",
+			httpmock.NewStringResponder(200, mockResponse))
+	} else {
+		littleDelay()
+	}
+
 	client := NewCurrency(table)
 
 	err := client.CurrencyByDate(currency, day)
@@ -76,7 +116,19 @@ func TestGetCurrencyDayShouldFailOfInvalidCurrencyCode(t *testing.T) {
 	var currency string = "AOA" // currency code valid for B table, not A
 	var day string = "2020-11-13"
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		var mockResponse string
+		mockResponse = `404 NotFound - Not Found - Brak danych`
+
+		httpmock.RegisterResponder("GET", baseAddressCurrency+"/rates/"+table+"/"+currency+"/"+day+"/",
+			httpmock.NewStringResponder(404, mockResponse))
+	} else {
+		littleDelay()
+	}
+
 	client := NewCurrency(table)
 
 	err := client.CurrencyByDate(currency, day)
@@ -90,7 +142,20 @@ func TestGetCurrencyDayTableC(t *testing.T) {
 	var currency string = "CHF"
 	var day string = "2020-11-13" // Friday 13 Nov 2020, CHF ask (sell) = 4.1980
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		var mockResponse string
+		mockResponse = `{"table":"C","currency":"frank szwajcarski","code":"CHF","rates":`
+		mockResponse += `[{"no":"222/C/NBP/2020","effectiveDate":"2020-11-13","bid":4.1148,"ask":4.1980}]}`
+
+		httpmock.RegisterResponder("GET", baseAddressCurrency+"/rates/"+table+"/"+currency+"/"+day+"/",
+			httpmock.NewStringResponder(200, mockResponse))
+	} else {
+		littleDelay()
+	}
+
 	client := NewCurrency(table)
 
 	err := client.CurrencyByDate(currency, day)
@@ -116,7 +181,18 @@ func TestGetCurrencyDaySaturdayFailed(t *testing.T) {
 	var currency string = "CHF"
 	var day string = "2020-11-14" // Saturday - no table of exchange rates
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		var mockResponse string
+		mockResponse = `404 NotFound - Not Found - Brak danych`
+
+		httpmock.RegisterResponder("GET", baseAddressCurrency+"/rates/"+table+"/"+currency+"/"+day+"/",
+			httpmock.NewStringResponder(404, mockResponse))
+	} else {
+		littleDelay()
+	}
 
 	client := NewCurrency(table)
 
@@ -131,7 +207,24 @@ func TestGetCurrencyLast(t *testing.T) {
 	var currency string = "CHF"
 	var last int = 5
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		var mockResponse string
+		mockResponse = `{"table":"A","currency":"frank szwajcarski","code":"CHF","rates":`
+		mockResponse += `[{"no":"234/A/NBP/2020","effectiveDate":"2020-12-01","mid":4.1226},`
+		mockResponse += `{"no":"235/A/NBP/2020","effectiveDate":"2020-12-02","mid":4.1112},`
+		mockResponse += `{"no":"236/A/NBP/2020","effectiveDate":"2020-12-03","mid":4.1362},`
+		mockResponse += `{"no":"237/A/NBP/2020","effectiveDate":"2020-12-04","mid":4.1241},`
+		mockResponse += `{"no":"238/A/NBP/2020","effectiveDate":"2020-12-07","mid":4.1417}]}`
+
+		httpmock.RegisterResponder("GET", baseAddressCurrency+"/rates/"+table+"/"+currency+"/last/"+strconv.Itoa(last)+"/",
+			httpmock.NewStringResponder(200, mockResponse))
+	} else {
+		littleDelay()
+	}
+
 	client := NewCurrency(table)
 
 	err := client.CurrencyLast(currency, last)
@@ -148,7 +241,24 @@ func TestGetCurrencyLastTableC(t *testing.T) {
 	var currency string = "CHF"
 	var last int = 5
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		var mockResponse string
+		mockResponse = `{"table":"C","currency":"frank szwajcarski","code":"CHF","rates":`
+		mockResponse += `[{"no":"234/C/NBP/2020","effectiveDate":"2020-12-01","bid":4.0842,"ask":4.1668},`
+		mockResponse += `{"no":"235/C/NBP/2020","effectiveDate":"2020-12-02","bid":4.0724,"ask":4.1546},`
+		mockResponse += `{"no":"236/C/NBP/2020","effectiveDate":"2020-12-03","bid":4.1025,"ask":4.1853},`
+		mockResponse += `{"no":"237/C/NBP/2020","effectiveDate":"2020-12-04","bid":4.0879,"ask":4.1705},`
+		mockResponse += `{"no":"238/C/NBP/2020","effectiveDate":"2020-12-07","bid":4.0937,"ask":4.1765}]}`
+
+		httpmock.RegisterResponder("GET", baseAddressCurrency+"/rates/"+table+"/"+currency+"/last/"+strconv.Itoa(last)+"/",
+			httpmock.NewStringResponder(200, mockResponse))
+	} else {
+		littleDelay()
+	}
+
 	client := NewCurrency(table)
 
 	err := client.CurrencyLast(currency, last)
@@ -165,7 +275,18 @@ func TestGetCurrencyLastFailed(t *testing.T) {
 	var currency string = "CHF"
 	var last int = 500 // nbp api real max = 255
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		var mockResponse string
+		mockResponse = `400 BadRequest - Przekroczony limit 255 wyników / Maximum size of 255 data series has been exceeded`
+
+		httpmock.RegisterResponder("GET", baseAddressCurrency+"/rates/"+table+"/"+currency+"/last/"+strconv.Itoa(last)+"/",
+			httpmock.NewStringResponder(400, mockResponse))
+	} else {
+		littleDelay()
+	}
 
 	client := NewCurrency(table)
 
@@ -180,7 +301,21 @@ func TestGetCurrencyRange(t *testing.T) {
 	var currency string = "CHF"
 	var day string = "2020-11-12:2020-11-13" // valid range, expected 2 currency exchange rates
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		var mockResponse string
+		mockResponse = `{"table":"A","currency":"frank szwajcarski","code":"CHF","rates":`
+		mockResponse += `[{"no":"221/A/NBP/2020","effectiveDate":"2020-11-12","mid":4.1573},`
+		mockResponse += `{"no":"222/A/NBP/2020","effectiveDate":"2020-11-13","mid":4.1605}]}`
+
+		httpmock.RegisterResponder("GET", baseAddressCurrency+"/rates/"+table+"/"+currency+"/2020-11-12/2020-11-13/",
+			httpmock.NewStringResponder(200, mockResponse))
+	} else {
+		littleDelay()
+	}
+
 	client := NewCurrency(table)
 
 	result, err := client.GetRateByDate(currency, day)
@@ -200,7 +335,18 @@ func TestGetCurrencyRangeFailed(t *testing.T) {
 	var currency string = "CHF"
 	var day string = "2020-11-12:2020-11-10" // invalid range of dates
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		var mockResponse string
+		mockResponse = `400 BadRequest - Błędny zakres dat / Invalid date range`
+
+		httpmock.RegisterResponder("GET", baseAddressCurrency+"/rates/"+table+"/"+currency+"/2020-11-12/2020-11-10/",
+			httpmock.NewStringResponder(400, mockResponse))
+	} else {
+		littleDelay()
+	}
 
 	client := NewCurrency(table)
 
@@ -215,7 +361,34 @@ func TestGetCurrencyToday(t *testing.T) {
 	var currency string = "CHF"
 	day := time.Now().Format("2006-01-02")
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		var mockResponse string
+		var mockStatus int
+
+		weekday := time.Now().Weekday()
+		if weekday == time.Saturday || weekday == time.Sunday {
+			mockResponse = `404 NotFound - Not Found - Brak danych`
+			mockStatus = 404
+
+		} else {
+			mockResponse = `{"table":"A","currency":"frank szwajcarski","code":"CHF","rates":`
+			mockResponse += `[{"no":"238/A/NBP/2020","effectiveDate":"2020-12-07","mid":4.1417}]}`
+			mockStatus = 200
+		}
+
+		httpmock.RegisterResponder("GET", baseAddressCurrency+"/rates/"+table+"/"+currency+"/today/",
+			httpmock.NewStringResponder(mockStatus, mockResponse))
+
+		httpmock.RegisterResponder("GET", baseAddressCurrency+"/rates/"+table+"/"+currency+"/"+day+"/",
+			httpmock.NewStringResponder(mockStatus, mockResponse))
+
+	} else {
+		littleDelay()
+	}
+
 	client := NewCurrency(table)
 
 	_, err := client.GetRateByDate(currency, day)
@@ -277,6 +450,19 @@ func TestQueryCurrencyDate(t *testing.T) {
 func TestCurrencyCSVOutput(t *testing.T) {
 	want := "TABLE,DATE,AVERAGE (PLN)"
 
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		var mockResponse string
+		mockResponse = `{"table":"A","currency":"euro","code":"EUR","rates":[{"no":"238/A/NBP/2020","effectiveDate":"2020-12-07","mid":4.4745}]}`
+
+		httpmock.RegisterResponder("GET", baseAddressCurrency+"/rates/A/EUR/",
+			httpmock.NewStringResponder(200, mockResponse))
+	} else {
+		littleDelay()
+	}
+
 	client := NewCurrency("A")
 	err := client.CurrencyByDate("EUR", "current")
 	if err != nil {
@@ -289,6 +475,19 @@ func TestCurrencyCSVOutput(t *testing.T) {
 }
 
 func TestCurrencyPrettyOutput(t *testing.T) {
+
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		var mockResponse string
+		mockResponse = `{"table":"A","currency":"euro","code":"EUR","rates":[{"no":"238/A/NBP/2020","effectiveDate":"2020-12-07","mid":4.4745}]}`
+
+		httpmock.RegisterResponder("GET", baseAddressCurrency+"/rates/A/EUR/",
+			httpmock.NewStringResponder(200, mockResponse))
+	} else {
+		littleDelay()
+	}
 
 	client := NewCurrency("A")
 	err := client.CurrencyByDate("EUR", "current")
@@ -308,6 +507,21 @@ func TestCurrencyPrettyOutput(t *testing.T) {
 }
 
 func TestCurrencyRaw(t *testing.T) {
+
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		var mockResponse string
+		mockResponse = `{"table":"C","currency":"euro","code":"EUR","rates":`
+		mockResponse += `[{"no":"235/C/NBP/2020","effectiveDate":"2020-12-02","bid":4.4151,"ask":4.5043}]}`
+
+		httpmock.RegisterResponder("GET", baseAddressCurrency+"/rates/C/EUR/2020-12-02/",
+			httpmock.NewStringResponder(200, mockResponse))
+	} else {
+		littleDelay()
+	}
+
 	client := NewCurrency("C")
 
 	err := client.CurrencyRaw("EUR", "2020-12-02", 0, "json")
@@ -324,6 +538,33 @@ func TestCurrencyToday(t *testing.T) {
 	var code string = "CHF"
 	var table string = "C"
 
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		var mockResponse string
+		var mockStatus int
+
+		weekday := time.Now().Weekday()
+		if weekday == time.Saturday || weekday == time.Sunday {
+			mockResponse = `404 NotFound - Not Found - Brak danych`
+			mockStatus = 404
+		} else {
+			mockResponse = `{"table":"C","currency":"euro","code":"EUR","rates":`
+			mockResponse += `[{"no":"235/C/NBP/2020","effectiveDate":"` + day + `","bid":4.4151,"ask":4.5043}]}`
+			mockStatus = 200
+		}
+
+		httpmock.RegisterResponder("GET", baseAddressCurrency+"/rates/"+table+"/"+code+"/"+day+"/",
+			httpmock.NewStringResponder(mockStatus, mockResponse))
+
+		httpmock.RegisterResponder("GET", baseAddressCurrency+"/rates/"+table+"/"+code+"/today/",
+			httpmock.NewStringResponder(mockStatus, mockResponse))
+
+	} else {
+		littleDelay()
+	}
+
 	client := NewCurrency(table)
 
 	err := client.CurrencyByDate(code, day)
@@ -336,6 +577,20 @@ func TestCurrencyToday(t *testing.T) {
 }
 
 func TestGetRateCurrent(t *testing.T) {
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		var mockResponse string
+		mockResponse = `{"table":"C","currency":"frank szwajcarski","code":"CHF","rates":`
+		mockResponse += `[{"no":"238/C/NBP/2020","effectiveDate":"2020-12-07","bid":4.0937,"ask":4.1765}]}`
+
+		httpmock.RegisterResponder("GET", baseAddressCurrency+"/rates/C/CHF/",
+			httpmock.NewStringResponder(200, mockResponse))
+	} else {
+		littleDelay()
+	}
+
 	client := NewCurrency("C")
 
 	result, err := client.GetRateCurrent("CHF")
@@ -349,6 +604,20 @@ func TestGetRateCurrent(t *testing.T) {
 }
 
 func TestGetRateCurrentB(t *testing.T) {
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		var mockResponse string
+		mockResponse = `{"table":"B","currency":"birr etiopski","code":"ETB","rates":`
+		mockResponse += `[{"no":"048/B/NBP/2020","effectiveDate":"2020-12-02","mid":0.0967}]}`
+
+		httpmock.RegisterResponder("GET", baseAddressCurrency+"/rates/B/ETB/",
+			httpmock.NewStringResponder(200, mockResponse))
+	} else {
+		littleDelay()
+	}
+
 	client := NewCurrency("B")
 
 	result, err := client.GetRateCurrent("ETB")
@@ -365,6 +634,35 @@ func TestGetRateToday(t *testing.T) {
 	day := time.Now().Format("2006-01-02")
 	var code string = "CHF"
 	var table string = "C"
+
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		var mockResponse string
+
+		weekday := time.Now().Weekday()
+		if weekday == time.Saturday || weekday == time.Sunday {
+			mockResponse = `404 NotFound - Not Found - Brak danych`
+
+			httpmock.RegisterResponder("GET", baseAddressCurrency+"/rates/C/CHF/today/",
+				httpmock.NewStringResponder(404, mockResponse))
+
+			httpmock.RegisterResponder("GET", baseAddressCurrency+"/rates/C/CHF/"+day+"/",
+				httpmock.NewStringResponder(404, mockResponse))
+		} else {
+			mockResponse = `{"table":"C","currency":"frank szwajcarski","code":"CHF","rates":`
+			mockResponse += `[{"no":"238/C/NBP/2020","effectiveDate":"2020-12-07","bid":4.0937,"ask":4.1765}]}`
+
+			httpmock.RegisterResponder("GET", baseAddressCurrency+"/rates/C/CHF/today/",
+				httpmock.NewStringResponder(200, mockResponse))
+
+			httpmock.RegisterResponder("GET", baseAddressCurrency+"/rates/C/CHF/"+day+"/",
+				httpmock.NewStringResponder(200, mockResponse))
+		}
+	} else {
+		littleDelay()
+	}
 
 	client := NewCurrency(table)
 
