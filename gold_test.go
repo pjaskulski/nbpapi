@@ -142,7 +142,7 @@ func TestGetGoldDay(t *testing.T) {
 	}
 }
 
-func TestGetGoldDayFailed(t *testing.T) {
+func TestGetGoldDayShouldFailedOnSunday(t *testing.T) {
 	var day string = "2020-11-15" // no data on this day (Sunday)
 
 	if useMock {
@@ -236,7 +236,7 @@ func TestGetGoldRange(t *testing.T) {
 	}
 }
 
-func TestShouldGetGoldByDateSuccess(t *testing.T) {
+func TestShouldGetGoldByDateWithSuccess(t *testing.T) {
 	var result []GoldRate
 	date := "2020-12-01"
 	expected := 211.7400 // the real price of gold on December 12, 2020 was PLN 211.7400
@@ -268,7 +268,7 @@ func TestShouldGetGoldByDateSuccess(t *testing.T) {
 	}
 }
 
-func TestShouldGetGoldCurrentSuccess(t *testing.T) {
+func TestShouldGetGoldCurrentWithSuccess(t *testing.T) {
 	var result []GoldRate
 	date := "current"
 
@@ -524,6 +524,20 @@ func TestGoldGetDataFailed(t *testing.T) {
 			},
 			wantErr: true,
 		},
+	}
+
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("GET", "http://api.nbp.pl/api/cenyzlotx",
+			httpmock.NewStringResponder(404, `404 NotFound`))
+
+		httpmock.RegisterResponder("GET", "http://api.nbp.pl/api/cenyzlota/2020-11-12/2020-11-10",
+			httpmock.NewStringResponder(400, `400 BadRequest - Błędny zakres dat / Invalid date range`))
+
+		httpmock.RegisterResponder("GET", "http://api.nbp.pl/api/cenyzlota/2020-11-29",
+			httpmock.NewStringResponder(404, `404 NotFound - Not Found - Brak danych`))
 	}
 
 	client := NewGold()
