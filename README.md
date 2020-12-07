@@ -29,6 +29,9 @@ make test
 make cover
 ```
 
+Warning: by default some tests use httpmock, to use the real NBP API service 
+you must set the USEMOCK environment variable to '0'
+
 ## Examples:
     
 ```go

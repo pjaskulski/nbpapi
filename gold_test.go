@@ -2,6 +2,7 @@ package nbpapi
 
 import (
 	"encoding/json"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -16,7 +17,7 @@ func TestGetGoldCurrent(t *testing.T) {
 		defer httpmock.DeactivateAndReset()
 
 		today := time.Now().Format("2006-01-01")
-		httpmock.RegisterResponder("GET", "http://api.nbp.pl/api/cenyzlota",
+		httpmock.RegisterResponder("GET", baseAddressGold,
 			httpmock.NewStringResponder(200, `[{"data":"`+today+`","cena":717.83}]`))
 	} else {
 		littleDelay() // delay if use real NBP API service
@@ -48,15 +49,15 @@ func TestGetGoldToday(t *testing.T) {
 
 		weekday := time.Now().Weekday()
 		if weekday == time.Saturday || weekday == time.Sunday {
-			httpmock.RegisterResponder("GET", "http://api.nbp.pl/api/cenyzlota/today/",
+			httpmock.RegisterResponder("GET", baseAddressGold+"/today/",
 				httpmock.NewStringResponder(404, `404 NotFound - Not Found - Brak danych`))
 
-			httpmock.RegisterResponder("GET", "http://api.nbp.pl/api/cenyzlota/"+today+"/",
+			httpmock.RegisterResponder("GET", baseAddressGold+"/"+today+"/",
 				httpmock.NewStringResponder(404, `404 NotFound - Not Found - Brak danych`))
 		} else {
-			httpmock.RegisterResponder("GET", "http://api.nbp.pl/api/cenyzlota/today/",
+			httpmock.RegisterResponder("GET", baseAddressGold+"/today/",
 				httpmock.NewStringResponder(200, `[{"data":"`+today+`","cena":717.83}]`))
-			httpmock.RegisterResponder("GET", "http://api.nbp.pl/api/cenyzlota/"+today+"/",
+			httpmock.RegisterResponder("GET", baseAddressGold+"/"+today+"/",
 				httpmock.NewStringResponder(200, `[{"data":"`+today+`","cena":717.83}]`))
 		}
 	} else {
@@ -83,15 +84,15 @@ func TestGetGoldTodayFailedBecaueOfWeekend(t *testing.T) {
 
 		weekday := time.Now().Weekday()
 		if weekday == time.Saturday || weekday == time.Sunday {
-			httpmock.RegisterResponder("GET", "http://api.nbp.pl/api/cenyzlota/today/",
+			httpmock.RegisterResponder("GET", baseAddressGold+"/today/",
 				httpmock.NewStringResponder(404, `404 NotFound - Not Found - Brak danych`))
 
-			httpmock.RegisterResponder("GET", "http://api.nbp.pl/api/cenyzlota/"+today+"/",
+			httpmock.RegisterResponder("GET", baseAddressGold+"/"+today+"/",
 				httpmock.NewStringResponder(404, `404 NotFound - Not Found - Brak danych`))
 		} else {
-			httpmock.RegisterResponder("GET", "http://api.nbp.pl/api/cenyzlota/today/",
+			httpmock.RegisterResponder("GET", baseAddressGold+"/today/",
 				httpmock.NewStringResponder(200, `[{"data":"`+today+`","cena":717.83}]`))
-			httpmock.RegisterResponder("GET", "http://api.nbp.pl/api/cenyzlota/"+today+"/",
+			httpmock.RegisterResponder("GET", baseAddressGold+"/"+today+"/",
 				httpmock.NewStringResponder(200, `[{"data":"`+today+`","cena":717.83}]`))
 		}
 	} else {
@@ -113,7 +114,15 @@ func TestGetGoldDay(t *testing.T) {
 	var day string = "2020-11-17"
 	var cena float64 = 229.03
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("GET", baseAddressGold+"/"+day+"/",
+			httpmock.NewStringResponder(200, `[{"data":"`+day+`","cena":229.03}]`))
+	} else {
+		littleDelay()
+	}
 
 	apiClient := NewGold()
 
@@ -134,9 +143,17 @@ func TestGetGoldDay(t *testing.T) {
 }
 
 func TestGetGoldDayFailed(t *testing.T) {
-	var day string = "2020-11-15" // brak notowań w tym dniu
+	var day string = "2020-11-15" // no data on this day (Sunday)
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("GET", baseAddressGold+"/"+day+"/",
+			httpmock.NewStringResponder(404, `404 NotFound - Not Found - Brak danych`))
+	} else {
+		littleDelay()
+	}
 
 	apiClient := NewGold()
 	_, err := apiClient.GetPriceByDate(day)
@@ -149,7 +166,20 @@ func TestGetGoldDayFailed(t *testing.T) {
 func TestGetGoldLast(t *testing.T) {
 	var lastNo int = 5
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		var mockResponse string
+		mockResponse = `[{"data":"2020-12-01","cena":211.74},{"data":"2020-12-02","cena":217.55},`
+		mockResponse += `{"data":"2020-12-03","cena":217.04},{"data":"2020-12-04","cena":217.86},`
+		mockResponse += `{"data":"2020-12-07","cena":217.83}]`
+
+		httpmock.RegisterResponder("GET", baseAddressGold+"/last/"+strconv.Itoa(lastNo),
+			httpmock.NewStringResponder(200, mockResponse))
+	} else {
+		littleDelay()
+	}
 
 	apiClient := NewGold()
 	err := apiClient.GoldLast(lastNo)
@@ -169,7 +199,18 @@ func TestGetGoldLast(t *testing.T) {
 func TestGetGoldRange(t *testing.T) {
 	var day string = "2020-11-16:2020-11-17"
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		var mockResponse string
+		mockResponse = `[{"data":"2020-11-16","cena":231.09},{"data":"2020-11-17","cena":229.03}]`
+
+		httpmock.RegisterResponder("GET", baseAddressGold+"/"+strings.Replace(day, ":", "/", 1),
+			httpmock.NewStringResponder(200, mockResponse))
+	} else {
+		littleDelay()
+	}
 
 	apiClient := NewGold()
 
@@ -187,11 +228,11 @@ func TestGetGoldRange(t *testing.T) {
 	}
 
 	if apiClient.GoldRates[0].Data != day[0:10] {
-		t.Errorf("invalid date, %s expected, %s received", day[0:10], apiClient.GoldRates[0].Data)
+		t.Errorf("invalid start date, %s expected, %s received", day[0:10], apiClient.GoldRates[0].Data)
 	}
 
 	if apiClient.GoldRates[1].Data != day[11:] {
-		t.Errorf("invalid date, %s expected, %s received", day[11:], apiClient.GoldRates[0].Data)
+		t.Errorf("invalid stop date, %s expected, %s received", day[11:], apiClient.GoldRates[1].Data)
 	}
 }
 
