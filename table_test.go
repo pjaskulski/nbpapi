@@ -5,12 +5,23 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/jarcoal/httpmock"
 )
 
 func TestTableByDateCurrent(t *testing.T) {
 	var table string = "A"
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("GET", baseAddressTable+"/tables/A/",
+			httpmock.NewStringResponder(200, mockTableA))
+	} else {
+		littleDelay()
+	}
+
 	client := NewTable(table)
 
 	err := client.TableByDate("current")
@@ -24,10 +35,19 @@ func TestTableByDateCurrent(t *testing.T) {
 
 func TestTableByDate(t *testing.T) {
 	var table string = "A"
-	var day string = "2020-11-17"
-	var tableNo string = "224/A/NBP/2020"
+	var day string = "2020-12-07"
+	var tableNo string = "238/A/NBP/2020"
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("GET", baseAddressTable+"/tables/A/2020-12-07/",
+			httpmock.NewStringResponder(200, mockTableA))
+	} else {
+		littleDelay()
+	}
+
 	client := NewTable(table)
 
 	err := client.TableByDate(day)
@@ -53,7 +73,16 @@ func TestTableByDateRange(t *testing.T) {
 	var table string = "A"
 	var day string = "2020-11-16:2020-11-17"
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("GET", baseAddressTable+"/tables/A/2020-11-16/2020-11-17/",
+			httpmock.NewStringResponder(200, mockRangeOfTablesA))
+	} else {
+		littleDelay()
+	}
+
 	client := NewTable(table)
 
 	err := client.TableByDate(day)
@@ -81,7 +110,16 @@ func TestTableLast(t *testing.T) {
 	var table string = "A"
 	var lastNo int = 5
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("GET", baseAddressTable+"/tables/A/last/5/",
+			httpmock.NewStringResponder(200, mockTableLast5))
+	} else {
+		littleDelay()
+	}
+
 	client := NewTable(table)
 	err := client.TableLast(lastNo)
 
@@ -99,12 +137,40 @@ func TestTableLast(t *testing.T) {
 
 func TestTableByDateToday(t *testing.T) {
 	var table string = "A"
-	day := time.Now().Format("2006-01-02")
+	today := time.Now().Format("2006-01-02")
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		var mockResponse string
+
+		weekday := time.Now().Weekday()
+		if weekday == time.Saturday || weekday == time.Sunday {
+			mockResponse = `404 NotFound - Not Found - Brak danych`
+
+			httpmock.RegisterResponder("GET", baseAddressTable+"/tables/A/"+today+"/",
+				httpmock.NewStringResponder(404, mockResponse))
+
+			httpmock.RegisterResponder("GET", baseAddressTable+"/tables/A/today/",
+				httpmock.NewStringResponder(404, mockResponse))
+
+		} else {
+			mockResponse = mockTableA // data published on 2020-12-07, but this does not matter in this test
+
+			httpmock.RegisterResponder("GET", baseAddressTable+"/tables/A/"+today+"/",
+				httpmock.NewStringResponder(200, mockResponse))
+
+			httpmock.RegisterResponder("GET", baseAddressTable+"/tables/A/today/",
+				httpmock.NewStringResponder(200, mockResponse))
+		}
+	} else {
+		littleDelay()
+	}
+
 	client := NewTable(table)
 
-	err := client.TableByDate(day)
+	err := client.TableByDate(today)
 	if err == nil {
 		err := client.TableByDate("today")
 		if err != nil {
@@ -116,7 +182,17 @@ func TestTableByDateToday(t *testing.T) {
 func TestTableByDateFailed(t *testing.T) {
 	var table string = "D"
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		mockResponse := `400 BadRequest - Bad Request - Nieprawidłowa wartość parametru: {table}='D'`
+		httpmock.RegisterResponder("GET", baseAddressTable+"/tables/D/today/",
+			httpmock.NewStringResponder(400, mockResponse))
+	} else {
+		littleDelay()
+	}
+
 	client := NewTable(table)
 
 	err := client.TableByDate("today")
@@ -173,7 +249,16 @@ func TestQueryTableRange(t *testing.T) {
 func TestTableCSVOutput(t *testing.T) {
 	want := "TABLE,CODE,NAME,AVERAGE (PLN)"
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("GET", baseAddressTable+"/tables/A/",
+			httpmock.NewStringResponder(200, mockTableA))
+	} else {
+		littleDelay()
+	}
+
 	client := NewTable("A")
 	err := client.TableByDate("current")
 	if err != nil {
@@ -188,7 +273,16 @@ func TestTableCSVOutput(t *testing.T) {
 func TestTableCCSVOutput(t *testing.T) {
 	want := "TABLE,CODE,NAME,BUY (PLN),SELL (PLN)"
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("GET", baseAddressTable+"/tables/C/",
+			httpmock.NewStringResponder(200, mockTableC))
+	} else {
+		littleDelay()
+	}
+
 	client := NewTable("C")
 	err := client.TableByDate("current")
 	if err != nil {
@@ -202,10 +296,19 @@ func TestTableCCSVOutput(t *testing.T) {
 }
 
 func TestTableRaw(t *testing.T) {
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("GET", baseAddressTable+"/tables/C/2020-12-07/",
+			httpmock.NewStringResponder(200, mockTableC))
+	} else {
+		littleDelay()
+	}
+
 	client := NewTable("C")
 
-	err := client.TableRaw("2020-12-02", 0, "json")
+	err := client.TableRaw("2020-12-07", 0, "json")
 	if err != nil {
 		t.Errorf("want err == nil, got err != nil")
 	}
@@ -215,10 +318,19 @@ func TestTableRaw(t *testing.T) {
 }
 
 func TestGetTableRawOutput(t *testing.T) {
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("GET", baseAddressTable+"/tables/C/2020-12-07/",
+			httpmock.NewStringResponder(200, mockTableC))
+	} else {
+		littleDelay()
+	}
+
 	client := NewTable("C")
 
-	err := client.TableRaw("2020-12-02", 0, "json")
+	err := client.TableRaw("2020-12-07", 0, "json")
 	if err != nil {
 		t.Errorf("want err == nil, got err != nil")
 	}
@@ -230,8 +342,18 @@ func TestGetTableRawOutput(t *testing.T) {
 }
 
 func TestGetTableCurrent(t *testing.T) {
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
 
-	littleDelay()
+		var mockResponse string
+		mockResponse = mockTableA
+		httpmock.RegisterResponder("GET", baseAddressTable+"/tables/A/",
+			httpmock.NewStringResponder(200, mockResponse))
+	} else {
+		littleDelay()
+	}
+
 	client := NewTable("A")
 	_, err := client.GetTableCurrent()
 	if err != nil {
@@ -240,8 +362,18 @@ func TestGetTableCurrent(t *testing.T) {
 }
 
 func TestGetTableCurrentFailed(t *testing.T) {
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
 
-	littleDelay()
+		var mockResponse string
+		mockResponse = mockTableC
+		httpmock.RegisterResponder("GET", baseAddressTable+"/tables/C/",
+			httpmock.NewStringResponder(200, mockResponse))
+	} else {
+		littleDelay()
+	}
+
 	client := NewTable("C")
 	_, err := client.GetTableCurrent()
 	if err == nil {
@@ -250,8 +382,18 @@ func TestGetTableCurrentFailed(t *testing.T) {
 }
 
 func TestGetTableCCurrent(t *testing.T) {
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
 
-	littleDelay()
+		var mockResponse string
+		mockResponse = mockTableC
+		httpmock.RegisterResponder("GET", baseAddressTable+"/tables/C/",
+			httpmock.NewStringResponder(200, mockResponse))
+	} else {
+		littleDelay()
+	}
+
 	client := NewTable("C")
 	_, err := client.GetTableCCurrent()
 	if err != nil {
@@ -260,7 +402,18 @@ func TestGetTableCCurrent(t *testing.T) {
 }
 
 func TestGetTableCCurrentFailedBecauseOfWrongType(t *testing.T) {
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		var mockResponse string
+		mockResponse = mockTableA
+		httpmock.RegisterResponder("GET", baseAddressTable+"/tables/A/",
+			httpmock.NewStringResponder(200, mockResponse))
+	} else {
+		littleDelay()
+	}
+
 	client := NewTable("A")
 
 	_, err := client.GetTableCCurrent()
@@ -270,12 +423,38 @@ func TestGetTableCCurrentFailedBecauseOfWrongType(t *testing.T) {
 }
 
 func TestGetTableToday(t *testing.T) {
-	day := time.Now().Format("2006-01-02")
+	today := time.Now().Format("2006-01-02")
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		var mockResponse string
+
+		weekday := time.Now().Weekday()
+		if weekday == time.Saturday || weekday == time.Sunday {
+			mockResponse = `404 NotFound - Not Found - Brak danych`
+
+			httpmock.RegisterResponder("GET", baseAddressTable+"/tables/A/",
+				httpmock.NewStringResponder(404, mockResponse))
+
+			httpmock.RegisterResponder("GET", baseAddressTable+"/tables/A/today/",
+				httpmock.NewStringResponder(404, mockResponse))
+		} else {
+			mockResponse = mockTableA
+			httpmock.RegisterResponder("GET", baseAddressTable+"/tables/A/",
+				httpmock.NewStringResponder(200, mockResponse))
+
+			httpmock.RegisterResponder("GET", baseAddressTable+"/tables/A/today/",
+				httpmock.NewStringResponder(200, mockResponse))
+		}
+	} else {
+		littleDelay()
+	}
+
 	client := NewTable("A")
 
-	_, err := client.GetTableByDate(day) // test if table for today exists
+	_, err := client.GetTableByDate(today) // test if table for today exists
 	if err == nil {
 		_, err := client.GetTableToday() // if it works for ..ByDay, should works for ..Today
 		if err != nil {
@@ -285,22 +464,54 @@ func TestGetTableToday(t *testing.T) {
 }
 
 func TestGetTableTodayShouldFailedBecauseOfWrongType(t *testing.T) {
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("GET", baseAddressTable+"/tables/C/today/",
+			httpmock.NewStringResponder(200, mockTableC))
+	} else {
+		littleDelay()
+	}
+
 	client := NewTable("C")
 
-	_, err := client.GetTableToday() // wrong func for C table type
+	_, err := client.GetTableToday() // wrong func for C table type, should be GetTableCToday
 	if err == nil {
 		t.Errorf("want: err != nil, got err == nil")
 	}
 }
 
 func TestGetTableTodayShouldFailedBecauseOfWeekend(t *testing.T) {
-	day := time.Now().Format("2006-01-02")
+	today := time.Now().Format("2006-01-02")
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		weekday := time.Now().Weekday()
+		if weekday == time.Saturday || weekday == time.Sunday {
+			mockResponse := `404 NotFound - Not Found - Brak danych`
+
+			httpmock.RegisterResponder("GET", baseAddressTable+"/tables/A/"+today+"/",
+				httpmock.NewStringResponder(404, mockResponse))
+
+			httpmock.RegisterResponder("GET", baseAddressTable+"/tables/A/today/",
+				httpmock.NewStringResponder(404, mockResponse))
+		} else {
+			httpmock.RegisterResponder("GET", baseAddressTable+"/tables/A/"+today+"/",
+				httpmock.NewStringResponder(200, mockTableA))
+
+			httpmock.RegisterResponder("GET", baseAddressTable+"/tables/A/today/",
+				httpmock.NewStringResponder(200, mockTableA))
+		}
+	} else {
+		littleDelay()
+	}
+
 	client := NewTable("A")
 
-	_, err := client.GetTableByDate(day)
+	_, err := client.GetTableByDate(today)
 	if err != nil {
 		_, err := client.GetTableToday()
 		if err == nil {
@@ -310,12 +521,35 @@ func TestGetTableTodayShouldFailedBecauseOfWeekend(t *testing.T) {
 }
 
 func TestGetTableCToday(t *testing.T) {
-	day := time.Now().Format("2006-01-02")
+	today := time.Now().Format("2006-01-02")
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		weekday := time.Now().Weekday()
+		if weekday == time.Saturday || weekday == time.Sunday {
+			mockResponse := `404 NotFound - Not Found - Brak danych`
+
+			httpmock.RegisterResponder("GET", baseAddressTable+"/tables/C/"+today+"/",
+				httpmock.NewStringResponder(404, mockResponse))
+
+			httpmock.RegisterResponder("GET", baseAddressTable+"/tables/C/today/",
+				httpmock.NewStringResponder(404, mockResponse))
+		} else {
+			httpmock.RegisterResponder("GET", baseAddressTable+"/tables/C/"+today+"/",
+				httpmock.NewStringResponder(200, mockTableC))
+
+			httpmock.RegisterResponder("GET", baseAddressTable+"/tables/C/today/",
+				httpmock.NewStringResponder(200, mockTableC))
+		}
+	} else {
+		littleDelay()
+	}
+
 	client := NewTable("C")
 
-	_, err := client.GetTableCByDate(day) // test if table for today exists
+	_, err := client.GetTableCByDate(today) // test if table for today exists
 	if err == nil {
 		_, err := client.GetTableCToday() // if it works for ..ByDay, should works for ..Today
 		if err != nil {
@@ -325,7 +559,16 @@ func TestGetTableCToday(t *testing.T) {
 }
 
 func TestGetTableTodayCFailedBecauseOfWrongType(t *testing.T) {
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("GET", baseAddressTable+"/tables/A/today/",
+			httpmock.NewStringResponder(200, mockTableA))
+	} else {
+		littleDelay()
+	}
+
 	client := NewTable("A")
 
 	_, err := client.GetTableCToday() // wrong func for A table type
@@ -335,12 +578,34 @@ func TestGetTableTodayCFailedBecauseOfWrongType(t *testing.T) {
 }
 
 func TestGetTableCTodayShouldFailedBecauseOfWeekend(t *testing.T) {
-	day := time.Now().Format("2006-01-02")
+	today := time.Now().Format("2006-01-02")
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		weekday := time.Now().Weekday()
+		if weekday == time.Saturday || weekday == time.Sunday {
+			httpmock.RegisterResponder("GET", baseAddressTable+"/tables/C/today/",
+				httpmock.NewStringResponder(404, `404 NotFound - Not Found - Brak danych`))
+
+			httpmock.RegisterResponder("GET", baseAddressTable+"/tables/C/"+today+"/",
+				httpmock.NewStringResponder(404, `404 NotFound - Not Found - Brak danych`))
+		} else {
+			httpmock.RegisterResponder("GET", baseAddressTable+"/tables/C/today/",
+				httpmock.NewStringResponder(200, mockTableC))
+
+			httpmock.RegisterResponder("GET", baseAddressTable+"/tables/C/"+today+"/",
+				httpmock.NewStringResponder(200, mockTableC))
+		}
+
+	} else {
+		littleDelay()
+	}
+
 	client := NewTable("C")
 
-	_, err := client.GetTableCByDate(day)
+	_, err := client.GetTableCByDate(today)
 	if err != nil {
 		_, err := client.GetTableCToday()
 		if err == nil {
@@ -350,9 +615,18 @@ func TestGetTableCTodayShouldFailedBecauseOfWeekend(t *testing.T) {
 }
 
 func TestGetTableByDate(t *testing.T) {
-	day := "2020-11-12"
+	day := "2020-12-07"
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("GET", baseAddressTable+"/tables/A/"+day+"/",
+			httpmock.NewStringResponder(200, mockTableA))
+	} else {
+		littleDelay()
+	}
+
 	client := NewTable("A")
 
 	_, err := client.GetTableByDate(day)
@@ -362,9 +636,18 @@ func TestGetTableByDate(t *testing.T) {
 }
 
 func TestGetTableByDateFailedBecauseOfWrongType(t *testing.T) {
-	day := "2020-11-12"
+	day := "2020-12-07"
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("GET", baseAddressTable+"/tables/C/"+day+"/",
+			httpmock.NewStringResponder(200, mockTableC))
+	} else {
+		littleDelay()
+	}
+
 	client := NewTable("C")
 
 	_, err := client.GetTableByDate(day)
@@ -374,9 +657,18 @@ func TestGetTableByDateFailedBecauseOfWrongType(t *testing.T) {
 }
 
 func TestGetTableCByDate(t *testing.T) {
-	day := "2020-11-12"
+	day := "2020-12-07"
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("GET", baseAddressTable+"/tables/C/"+day+"/",
+			httpmock.NewStringResponder(200, mockTableC))
+	} else {
+		littleDelay()
+	}
+
 	client := NewTable("C")
 
 	_, err := client.GetTableCByDate(day)
@@ -386,9 +678,18 @@ func TestGetTableCByDate(t *testing.T) {
 }
 
 func TestGetTableCByDateFailedBecauseOfWrongType(t *testing.T) {
-	day := "2020-11-12"
+	day := "2020-12-07"
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("GET", baseAddressTable+"/tables/A/"+day+"/",
+			httpmock.NewStringResponder(200, mockTableA))
+	} else {
+		littleDelay()
+	}
+
 	client := NewTable("A")
 
 	_, err := client.GetTableCByDate(day)
@@ -398,9 +699,18 @@ func TestGetTableCByDateFailedBecauseOfWrongType(t *testing.T) {
 }
 
 func TestTablePrettyOutput(t *testing.T) {
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
 
-	littleDelay()
+		httpmock.RegisterResponder("GET", baseAddressTable+"/tables/A/",
+			httpmock.NewStringResponder(200, mockTableA))
+	} else {
+		littleDelay()
+	}
+
 	client := NewTable("A")
+
 	err := client.TableByDate("current")
 	if err != nil {
 		t.Error(err)
@@ -423,9 +733,18 @@ func TestTablePrettyOutput(t *testing.T) {
 }
 
 func TestTableCPrettyOutput(t *testing.T) {
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
 
-	littleDelay()
+		httpmock.RegisterResponder("GET", baseAddressTable+"/tables/C/",
+			httpmock.NewStringResponder(200, mockTableC))
+	} else {
+		littleDelay()
+	}
+
 	client := NewTable("C")
+
 	err := client.TableByDate("current")
 	if err != nil {
 		t.Error(err)
@@ -449,10 +768,19 @@ func TestTableCPrettyOutput(t *testing.T) {
 
 func TestTableCByDate(t *testing.T) {
 	var table string = "C"
-	var day string = "2020-11-17"
-	var tableNo string = "224/C/NBP/2020"
+	var day string = "2020-12-07"
+	var tableNo string = "238/C/NBP/2020"
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("GET", baseAddressTable+"/tables/C/2020-12-07/",
+			httpmock.NewStringResponder(200, mockTableC))
+	} else {
+		littleDelay()
+	}
+
 	client := NewTable(table)
 
 	err := client.TableByDate(day)
@@ -478,8 +806,18 @@ func TestTableLastC(t *testing.T) {
 	var table string = "C"
 	var lastNo int = 5
 
-	littleDelay()
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("GET", baseAddressTable+"/tables/C/last/5/",
+			httpmock.NewStringResponder(200, mockTableCLast5))
+	} else {
+		littleDelay()
+	}
+
 	client := NewTable(table)
+
 	err := client.TableLast(lastNo)
 
 	if err != nil {
