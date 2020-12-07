@@ -9,15 +9,6 @@ import (
 	"github.com/jarcoal/httpmock"
 )
 
-func init() {
-
-	if !useMock {
-		return
-	}
-
-}
-
-// low level getData tests
 func TestGetGoldCurrent(t *testing.T) {
 
 	if useMock {
@@ -409,6 +400,7 @@ func TestGoldGetPrettyOutput(t *testing.T) {
 	}
 }
 
+// low level getData tests
 func TestGoldGetDataFailed(t *testing.T) {
 	type args struct {
 		url    string
