@@ -8,8 +8,8 @@ run:
 test:
 	go test -v .
 
-testcheck:
-	go test -v -run TestCheckArg .
+testrandomint:
+	go test -v -run TestRandomInteger .
 
 cover:
 	go test -cover .
