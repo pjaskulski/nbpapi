@@ -444,6 +444,8 @@ func (c *NBPCurrency) SetTableType(tableType string) error {
 	if err != nil {
 		return err
 	}
+
+	c.tableType = tableType
 	return nil
 }
 

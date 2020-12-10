@@ -317,6 +317,28 @@ func TestTableRaw(t *testing.T) {
 	}
 }
 
+func TestTableRawXML(t *testing.T) {
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("GET", baseAddressTable+"/tables/C/2020-12-07/",
+			httpmock.NewStringResponder(200, mockTableCXML))
+	} else {
+		littleDelay()
+	}
+
+	client := NewTable("C")
+
+	err := client.TableRaw("2020-12-07", 0, "xml")
+	if err != nil {
+		t.Errorf("want err == nil, got err != nil")
+	}
+	if !IsValidXML(string(client.result)) {
+		t.Errorf("incorrect xml content was received")
+	}
+}
+
 func TestGetTableRawOutput(t *testing.T) {
 	if useMock {
 		httpmock.Activate()
@@ -829,5 +851,17 @@ func TestTableLastC(t *testing.T) {
 
 	if len(client.ExchangeC) != 5 {
 		t.Errorf("5 exchange rate tables were expected, received: %d", len(client.ExchangeC))
+	}
+}
+
+func TestSetTableType(t *testing.T) {
+	client := NewTable("B")
+	if client.tableType != "B" {
+		t.Errorf("want: B, got %s", client.tableType)
+	}
+
+	client.SetTableType("A")
+	if client.tableType != "A" {
+		t.Errorf("want: A, got %s", client.tableType)
 	}
 }

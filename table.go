@@ -413,6 +413,8 @@ func (t *NBPTable) SetTableType(tableType string) error {
 	if err != nil {
 		return err
 	}
+
+	t.tableType = tableType
 	return nil
 }
 

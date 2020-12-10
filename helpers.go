@@ -3,8 +3,11 @@
 package nbpapi
 
 import (
+	"encoding/xml"
 	"errors"
+	"io"
 	"math/rand"
+	"strings"
 	"time"
 )
 
@@ -65,4 +68,15 @@ func checkTableType(tableType string) error {
 		return ErrInvalidTableType
 	}
 	return nil
+}
+
+// IsValidXML - func from: https://stackoverflow.com/questions/53476012/how-to-validate-a-xml
+func IsValidXML(input string) bool {
+	decoder := xml.NewDecoder(strings.NewReader(input))
+	for {
+		err := decoder.Decode(new(interface{}))
+		if err != nil {
+			return err == io.EOF
+		}
+	}
 }

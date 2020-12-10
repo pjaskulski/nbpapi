@@ -204,3 +204,92 @@ var mockTableCLast5 string = `[{"table":"C","no":"234/C/NBP/2020","tradingDate":
 {"currency":"korona czeska","code":"CZK","bid":0.1670,"ask":0.1704},{"currency":"korona duńska","code":"DKK","bid":0.5947,"ask":0.6067},
 {"currency":"korona norweska","code":"NOK","bid":0.4154,"ask":0.4238},{"currency":"korona szwedzka","code":"SEK","bid":0.4316,"ask":0.4404},
 {"currency":"SDR (MFW)","code":"XDR","bid":5.2337,"ask":5.3395}]}]`
+
+var mockTableCXML string = `<ArrayOfExchangeRatesTable xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<ExchangeRatesTable>
+<Table>C</Table>
+<No>238/C/NBP/2020</No>
+<TradingDate>2020-12-04</TradingDate>
+<EffectiveDate>2020-12-07</EffectiveDate>
+<Rates>
+<Rate>
+<Currency>dolar amerykański</Currency>
+<Code>USD</Code>
+<Bid>3.6408</Bid>
+<Ask>3.7144</Ask>
+</Rate>
+<Rate>
+<Currency>dolar australijski</Currency>
+<Code>AUD</Code>
+<Bid>2.7081</Bid>
+<Ask>2.7629</Ask>
+</Rate>
+<Rate>
+<Currency>dolar kanadyjski</Currency>
+<Code>CAD</Code>
+<Bid>2.8419</Bid>
+<Ask>2.8993</Ask>
+</Rate>
+<Rate>
+<Currency>euro</Currency>
+<Code>EUR</Code>
+<Bid>4.4264</Bid>
+<Ask>4.5158</Ask>
+</Rate>
+<Rate>
+<Currency>forint (Węgry)</Currency>
+<Code>HUF</Code>
+<Bid>0.012349</Bid>
+<Ask>0.012599</Ask>
+</Rate>
+<Rate>
+<Currency>frank szwajcarski</Currency>
+<Code>CHF</Code>
+<Bid>4.0937</Bid>
+<Ask>4.1765</Ask>
+</Rate>
+<Rate>
+<Currency>funt szterling</Currency>
+<Code>GBP</Code>
+<Bid>4.9226</Bid>
+<Ask>5.0220</Ask>
+</Rate>
+<Rate>
+<Currency>jen (Japonia)</Currency>
+<Code>JPY</Code>
+<Bid>0.035006</Bid>
+<Ask>0.035714</Ask>
+</Rate>
+<Rate>
+<Currency>korona czeska</Currency>
+<Code>CZK</Code>
+<Bid>0.1670</Bid>
+<Ask>0.1704</Ask>
+</Rate>
+<Rate>
+<Currency>korona duńska</Currency>
+<Code>DKK</Code>
+<Bid>0.5947</Bid>
+<Ask>0.6067</Ask>
+</Rate>
+<Rate>
+<Currency>korona norweska</Currency>
+<Code>NOK</Code>
+<Bid>0.4154</Bid>
+<Ask>0.4238</Ask>
+</Rate>
+<Rate>
+<Currency>korona szwedzka</Currency>
+<Code>SEK</Code>
+<Bid>0.4316</Bid>
+<Ask>0.4404</Ask>
+</Rate>
+<Rate>
+<Currency>SDR (MFW)</Currency>
+<Code>XDR</Code>
+<Bid>5.2337</Bid>
+<Ask>5.3395</Ask>
+</Rate>
+</Rates>
+</ExchangeRatesTable>
+</ArrayOfExchangeRatesTable>`
