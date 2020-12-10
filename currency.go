@@ -440,10 +440,17 @@ func (c *NBPCurrency) GetRawOutput() string {
 
 // SetTableType - the function allows to set the supported type of exchange rate table
 func (c *NBPCurrency) SetTableType(tableType string) error {
+	if c.tableType == tableType {
+		return nil
+	}
+
 	err := checkTableType(tableType)
 	if err != nil {
 		return err
 	}
+
+	// data cleaning
+	c.clearData()
 
 	c.tableType = tableType
 	return nil
@@ -458,6 +465,13 @@ func (c *NBPCurrency) SetTableType(tableType string) error {
 */
 func (c *NBPCurrency) getData(url, format string) ([]byte, error) {
 	return fetchData(c.Client, url, format)
+}
+
+// clearData - function clears data
+func (c *NBPCurrency) clearData() {
+	c.result = nil
+	c.Exchange = exchangeCurrency{}
+	c.ExchangeC = exchangeCurrencyC{}
 }
 
 // --------------------- Private func ---------------------------------

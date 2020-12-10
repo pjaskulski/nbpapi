@@ -678,3 +678,15 @@ func TestGetRateToday(t *testing.T) {
 		}
 	}
 }
+
+func TestCurrencySetTableType(t *testing.T) {
+	client := NewCurrency("B")
+	if client.tableType != "B" {
+		t.Errorf("want: B, got %s", client.tableType)
+	}
+
+	client.SetTableType("A")
+	if client.tableType != "A" {
+		t.Errorf("want: A, got %s", client.tableType)
+	}
+}

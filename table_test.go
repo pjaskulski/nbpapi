@@ -854,7 +854,7 @@ func TestTableLastC(t *testing.T) {
 	}
 }
 
-func TestSetTableType(t *testing.T) {
+func TestTableSetTableType(t *testing.T) {
 	client := NewTable("B")
 	if client.tableType != "B" {
 		t.Errorf("want: B, got %s", client.tableType)
