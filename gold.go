@@ -244,6 +244,8 @@ func (g *NBPGold) GetRawOutput() string {
 	return string(g.result)
 }
 
+// ------------------- private func -----------------------------------
+
 /* getData - function that retrieves data from the NBP website
    and returns them in the form of JSON / XML (or error), based on
    the arguments provided:
@@ -252,13 +254,18 @@ func (g *NBPGold) GetRawOutput() string {
    format - 'json' or 'xml'
 */
 func (g *NBPGold) getData(url, format string) ([]byte, error) {
+	g.clearData()
 	return fetchData(g.Client, url, format)
 }
 
-// ------------------- private func -----------------------------------
+// clearData - data cleaning
+func (g *NBPGold) clearData() {
+	g.result = nil
+	g.GoldRates = nil
+}
 
 // getGoldAddress - build download address depending on previously
-// verified input parameters (--date or --last)
+// verified input parameters (date or last)
 func (g *NBPGold) getGoldAddress(date string, last int) string {
 	var address string
 

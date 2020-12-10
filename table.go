@@ -433,6 +433,7 @@ func (t *NBPTable) SetTableType(tableType string) error {
    format - 'json' or 'xml'
 */
 func (t *NBPTable) getData(url, format string) ([]byte, error) {
+	t.clearData()
 	return fetchData(t.Client, url, format)
 }
 

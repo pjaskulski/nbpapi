@@ -464,6 +464,7 @@ func (c *NBPCurrency) SetTableType(tableType string) error {
    format - 'json' or 'xml'
 */
 func (c *NBPCurrency) getData(url, format string) ([]byte, error) {
+	c.clearData()
 	return fetchData(c.Client, url, format)
 }
 
