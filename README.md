@@ -111,6 +111,8 @@ More examples in the \ example folder.
 	  - GetPrettyOutput 
       - GetCSVOutput
       - GetRawOutput
+    * other methods:
+      - SetTableType
 2. **NBPCurrency** type - particular currency exchange rates:
     * create new: `client := NewCurrency("A")`
     * methods that downloading data into NBPCurrency type structures:
@@ -126,6 +128,8 @@ More examples in the \ example folder.
       - GetPrettyOutput 
       - GetCSVOutput 
       - GetRawOutput
+    * other methods:
+      - SetTableType
 3. **NBPGold** type - gold prices:
     * create new: `client := NewGold()`
     * methods that downloading data into NBPGold type structures:
@@ -146,6 +150,49 @@ Detailed documentation:
 
 ```
 package nbpapi // import "github.com/pjaskulski/nbpapi"
+
+
+VARIABLES
+
+var (
+	ErrInvalidCurrencyCode error = errors.New("Invalid currency code")
+	ErrInvalidTableType    error = errors.New("Invalid table type, allowed values: A, B or C")
+)
+    errors for invalid code, table type
+
+var CurrencyValuesA = []string{"THB", "USD", "AUD", "HKD", "CAD", "NZD", "SGD", "EUR", "HUF", "CHF",
+	"GBP", "UAH", "JPY", "CZK", "DKK", "ISK", "NOK", "SEK", "HRK", "RON",
+	"BGN", "TRY", "ILS", "CLP", "PHP", "MXN", "ZAR", "BRL", "MYR", "RUB",
+	"IDR", "INR", "KRW", "CNY", "XDR"}
+    CurrencyValuesA - list of supported currencies for table type A
+
+var CurrencyValuesB = []string{"MGA", "PAB", "ETB", "AFN", "VES", "BOB", "CRC", "SVC", "NIO", "GMD",
+	"MKD", "DZD", "BHD", "IQD", "JOD", "KWD", "LYD", "RSD", "TND", "MAD",
+	"AED", "STN", "BSD", "BBD", "BZD", "BND", "FJD", "GYD", "JMD", "LRD",
+	"NAD", "SRD", "TTD", "XCD", "SBD", "ZWL", "VND", "AMD", "CVE", "AWG",
+	"BIF", "XOF", "XAF", "XPF", "DJF", "GNF", "KMF", "CDF", "RWF", "EGP",
+	"GIP", "LBP", "SSP", "SDG", "SYP", "GHS", "HTG", "PYG", "ANG", "PGK",
+	"LAK", "MWK", "ZMW", "AOA", "MMK", "GEL", "MDL", "ALL", "HNL", "SLL",
+	"SZL", "LSL", "AZN", "MZN", "NGN", "ERN", "TWD", "TMT", "MRU", "TOP",
+	"MOP", "ARS", "DOP", "COP", "CUP", "UYU", "BWP", "GTQ", "IRR", "YER",
+	"QAR", "OMR", "SAR", "KHR", "BYN", "LKR", "MVR", "MUR", "NPR", "PKR",
+	"SCR", "PEN", "KGS", "TJS", "UZS", "KES", "SOS", "TZS", "UGX", "BDT",
+	"WST", "KZT", "MNT", "VUV", "BAM"}
+    CurrencyValuesB - list of supported currencies for table type B
+
+var CurrencyValuesC = []string{"USD", "AUD", "CAD", "EUR", "HUF", "CHF", "GBP", "JPY", "CZK", "DKK", "NOK",
+	"SEK", "XDR"}
+    CurrencyValuesC - list of supported currencies for table type C
+
+var TableValues = []string{"A", "B", "C"}
+    TableValues - list of table types
+
+
+FUNCTIONS
+
+func IsValidXML(input string) bool
+    IsValidXML - func from:
+    https://stackoverflow.com/questions/53476012/how-to-validate-a-xml
 
 
 TYPES
@@ -184,7 +231,7 @@ type NBPCurrency struct {
 func NewCurrency(tableType string) *NBPCurrency
     NewCurrency - function creates new currency type
 
-func (c *NBPCurrency) CurrencyByDate(code string, date string) error
+func (c *NBPCurrency) CurrencyByDate(code, date string) error
     CurrencyByDate - function downloads and writes data to exchange (exchangeC)
     slice, raw data (json) still available in result field
 
@@ -215,7 +262,7 @@ func (c *NBPCurrency) CurrencyLast(code string, last int) error
         last - as an alternative to date, the last <n> tables/rates
         can be retrieved
 
-func (c *NBPCurrency) CurrencyRaw(code string, date string, last int, format string) error
+func (c *NBPCurrency) CurrencyRaw(code, date string, last int, format string) error
     CurrencyRaw - function downloads data in json or xml form
 
 
@@ -266,7 +313,7 @@ func (c *NBPCurrency) GetPrettyOutput(lang string) string
 
         lang - 'en' or 'pl'
 
-func (c *NBPCurrency) GetRateByDate(code string, date string) ([]Rate, error)
+func (c *NBPCurrency) GetRateByDate(code, date string) ([]Rate, error)
     GetRateByDate - function downloads today's currency exchange rate and
     returns slice of Rate struct (or error)
 
@@ -299,6 +346,10 @@ func (c *NBPCurrency) GetRateToday(code string) (Rate, error)
 
 func (c *NBPCurrency) GetRawOutput() string
     GetRawOutput - function print just result of request (json or xml)
+
+func (c *NBPCurrency) SetTableType(tableType string) error
+    SetTableType - the function allows to set the supported type of exchange
+    rate table
 
 type NBPGold struct {
 	GoldRates []GoldRate
@@ -464,6 +515,10 @@ func (t *NBPTable) GetTableToday() ([]ExchangeTable, error)
     GetTableToday - function downloads today's table of currency exchange rates
     and return slice of struct ExchangeTable (or error), version for table A, B
     (mid - average price)
+
+func (t *NBPTable) SetTableType(tableType string) error
+    SetTableType - the function allows to set the supported type of exchange
+    rate table
 
 func (t *NBPTable) TableByDate(date string) error
     TableByDate - function downloads and writes data to NBPTable.Exchange
