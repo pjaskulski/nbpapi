@@ -533,6 +533,44 @@ func TestCurrencyRaw(t *testing.T) {
 	}
 }
 
+func TestCurrencyRawXML(t *testing.T) {
+
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		mockResponse := `
+<ExchangeRatesSeries xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<Table>C</Table>
+<Currency>euro</Currency>
+<Code>EUR</Code>
+<Rates>
+	<Rate>
+		<No>235/C/NBP/2020</No>
+		<EffectiveDate>2020-12-02</EffectiveDate>
+		<Bid>4.4151</Bid>
+		<Ask>4.5043</Ask>
+	</Rate>
+</Rates>
+</ExchangeRatesSeries>`
+
+		httpmock.RegisterResponder("GET", baseAddressCurrency+"/rates/C/EUR/2020-12-02/",
+			httpmock.NewStringResponder(200, mockResponse))
+	} else {
+		littleDelay()
+	}
+
+	client := NewCurrency("C")
+
+	err := client.CurrencyRaw("EUR", "2020-12-02", 0, "xml")
+	if err != nil {
+		t.Errorf("want err == nil, got err != nil")
+	}
+	if !IsValidXML(string(client.result)) {
+		t.Errorf("incorrect xml content was received")
+	}
+}
+
 func TestCurrencyToday(t *testing.T) {
 	day := time.Now().Format("2006-01-02")
 	var code string = "CHF"

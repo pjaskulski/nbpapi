@@ -600,6 +600,36 @@ func TestGoldRaw(t *testing.T) {
 	}
 }
 
+func TestGoldRawXML(t *testing.T) {
+	if useMock {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		mockResponse := `
+		<ArrayOfCenaZlota xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+		<CenaZlota>
+		<Data>2020-12-02</Data>
+		<Cena>217.55</Cena>
+		</CenaZlota>
+		</ArrayOfCenaZlota>`
+
+		httpmock.RegisterResponder("GET", baseAddressGold+"/2020-12-02",
+			httpmock.NewStringResponder(200, mockResponse))
+	} else {
+		littleDelay()
+	}
+
+	client := NewGold()
+
+	err := client.GoldRaw("2020-12-02", 0, "xml")
+	if err != nil {
+		t.Errorf("want err == nil, got err != nil")
+	}
+	if !IsValidXML(string(client.result)) {
+		t.Errorf("incorrect xml content was received")
+	}
+}
+
 func TestGoldRawOutput(t *testing.T) {
 	if useMock {
 		httpmock.Activate()
