@@ -186,15 +186,16 @@ func (g *NBPGold) GetPriceByDate(date string) ([]GoldRate, error) {
 }
 
 /*
-GetPrettyOutput - function returns a formatted table of gold prices
+CreatePrettyOutput - function returns a formatted table of gold prices
 
 Parameters:
 
     lang - 'en' or 'pl'
 */
-func (g *NBPGold) GetPrettyOutput(lang string) string {
+func (g *NBPGold) CreatePrettyOutput(lang string) string {
 	const padding = 3
 	var builder strings.Builder
+	var total float64
 
 	// output language
 	setLang(lang)
@@ -208,23 +209,33 @@ func (g *NBPGold) GetPrettyOutput(lang string) string {
 	fmt.Fprintln(w, l.Get("DATE \t PRICE (PLN)"))
 	fmt.Fprintln(w, l.Get("---- \t ----------- "))
 	for _, goldItem := range g.GoldRates {
+		total += goldItem.Price
 		goldValue := fmt.Sprintf("%.4f", goldItem.Price)
 		fmt.Fprintln(w, goldItem.Data+" \t "+goldValue)
 	}
+
+	if len(g.GoldRates) > 1 {
+		avg := total / float64(len(g.GoldRates))
+
+		fmt.Fprintln(w)
+		fmt.Fprintln(w, l.Get("The average of the last quotations is: "), fmt.Sprintf("%.4f", avg))
+		fmt.Fprintln(w)
+	}
+
 	w.Flush()
 
 	return builder.String()
 }
 
 /*
-GetCSVOutput - function returns prices of gold in CSV format
+CreateCSVOutput - function returns prices of gold in CSV format
 (comma separated data)
 
 Parameters:
 
     lang - 'en' or 'pl'
 */
-func (g *NBPGold) GetCSVOutput(lang string) string {
+func (g *NBPGold) CreateCSVOutput(lang string) string {
 	var output string = ""
 
 	// output language
@@ -239,8 +250,8 @@ func (g *NBPGold) GetCSVOutput(lang string) string {
 	return output
 }
 
-// GetRawOutput - function returns just result of request (json or xml)
-func (g *NBPGold) GetRawOutput() string {
+// CreateRawOutput - function returns just result of request (json or xml)
+func (g *NBPGold) CreateRawOutput() string {
 	return string(g.result)
 }
 

@@ -16,6 +16,6 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		fmt.Println(nbpTable.GetPrettyOutput("en"))
+		fmt.Println(nbpTable.CreatePrettyOutput("en"))
 	}
 }

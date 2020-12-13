@@ -35,7 +35,7 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		fmt.Println(gold.GetPrettyOutput("en"))
+		fmt.Println(gold.CreatePrettyOutput("en"))
 	}
 	fmt.Println()
 
@@ -53,4 +53,15 @@ func main() {
 			fmt.Println(rate.Data, "\t", rate.Price)
 		}
 	}
+
+	/*
+		function GoldLast return slice of GoldPrice struct
+	*/
+	err = gold.GoldLast(10)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println(gold.CreatePrettyOutput("en"))
+	fmt.Println(gold.CreatePrettyOutput("pl"))
 }

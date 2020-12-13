@@ -297,7 +297,7 @@ func (t *NBPTable) GetTableCToday() ([]ExchangeTableC, error) {
 }
 
 /*
-GetPrettyOutput - function returns tables of exchange rates as
+CreatePrettyOutput - function returns tables of exchange rates as
 formatted table, depending on the tableType field: for type A and B tables
 a column with an average rate is printed, for type C two columns:
 buy price and sell price
@@ -306,7 +306,7 @@ Parameters:
 
     lang - 'en' or 'pl'
 */
-func (t *NBPTable) GetPrettyOutput(lang string) string {
+func (t *NBPTable) CreatePrettyOutput(lang string) string {
 	const padding = 3
 	var builder strings.Builder
 	var output string
@@ -360,7 +360,7 @@ func (t *NBPTable) GetPrettyOutput(lang string) string {
 }
 
 /*
-GetCSVOutput - function prints tables of exchange rates in the console,
+CreateCSVOutput - function prints tables of exchange rates in the console,
 in the form of CSV (data separated by a comma), depending on the
 tableType field: for type A and B tables a column with an average
 rate is printed, for type C two columns: buy price and sell price
@@ -369,7 +369,7 @@ Parameters:
 
     lang - 'en' or 'pl'
 */
-func (t *NBPTable) GetCSVOutput(lang string) string {
+func (t *NBPTable) CreateCSVOutput(lang string) string {
 	var tableNo string
 	var output string = ""
 
@@ -402,8 +402,8 @@ func (t *NBPTable) GetCSVOutput(lang string) string {
 	return output
 }
 
-// GetRawOutput - function returns just result of request (json or xml)
-func (t *NBPTable) GetRawOutput() string {
+// CreateRawOutput - function returns just result of request (json or xml)
+func (t *NBPTable) CreateRawOutput() string {
 	return string(t.result)
 }
 

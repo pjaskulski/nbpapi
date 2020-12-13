@@ -468,7 +468,7 @@ func TestCurrencyCSVOutput(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	output := client.GetCSVOutput("en")
+	output := client.CreateCSVOutput("en")
 	if output[:24] != want {
 		t.Errorf("invalid csv output, expected header: %s, got: %s", want, output[:29])
 	}
@@ -494,7 +494,7 @@ func TestCurrencyPrettyOutput(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	output := client.GetPrettyOutput("en")
+	output := client.CreatePrettyOutput("en")
 
 	if len(output) == 0 {
 		t.Errorf("incorrect (empty) pretty output")

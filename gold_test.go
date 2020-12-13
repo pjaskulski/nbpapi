@@ -464,7 +464,7 @@ func TestGoldGetCSVOutputShouldReturnCSVData(t *testing.T) {
 		t.Errorf("expected: err == nil, received: err != nil")
 	}
 
-	result = apiClient.GetCSVOutput("en")
+	result = apiClient.CreateCSVOutput("en")
 
 	if len(result) == 0 {
 		t.Errorf("incorrect (empty) CSV output")
@@ -499,7 +499,7 @@ func TestGoldGetPrettyOutputShouldReturnPrettyText(t *testing.T) {
 		t.Errorf("expected: err == nil, received: err != nil")
 	}
 
-	result = apiClient.GetPrettyOutput("en")
+	result = apiClient.CreatePrettyOutput("en")
 
 	if len(result) == 0 {
 		t.Errorf("incorrect (empty) pretty output")
@@ -651,7 +651,7 @@ func TestGoldRawOutput(t *testing.T) {
 		t.Error(err)
 	}
 
-	output := client.GetRawOutput()
+	output := client.CreateRawOutput()
 	if output == "" {
 		t.Errorf("invalid (empty) raw output")
 	}

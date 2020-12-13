@@ -264,7 +264,7 @@ func TestTableCSVOutput(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	output := client.GetCSVOutput("en")
+	output := client.CreateCSVOutput("en")
 	if output[:29] != want {
 		t.Errorf("invalid csv output, expected header: %s, got: %s", want, output[:29])
 	}
@@ -288,7 +288,7 @@ func TestTableCCSVOutput(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	output := client.GetCSVOutput("en")
+	output := client.CreateCSVOutput("en")
 	header := output[:len(want)]
 	if header != want {
 		t.Errorf("invalid csv output, expected header: %s, got: %s", want, header)
@@ -357,7 +357,7 @@ func TestGetTableRawOutput(t *testing.T) {
 		t.Errorf("want err == nil, got err != nil")
 	}
 
-	output := client.GetRawOutput()
+	output := client.CreateRawOutput()
 	if output == "" {
 		t.Errorf("invalid (empty) raw output")
 	}
@@ -737,7 +737,7 @@ func TestTablePrettyOutput(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	output := client.GetPrettyOutput("en")
+	output := client.CreatePrettyOutput("en")
 
 	if len(output) == 0 {
 		t.Errorf("incorrect (empty) pretty output")
@@ -771,7 +771,7 @@ func TestTableCPrettyOutput(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	output := client.GetPrettyOutput("en")
+	output := client.CreatePrettyOutput("en")
 
 	if len(output) == 0 {
 		t.Errorf("incorrect (empty) pretty output")

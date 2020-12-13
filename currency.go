@@ -347,7 +347,7 @@ func (c *NBPCurrency) GetRateByDate(code, date string) ([]Rate, error) {
 }
 
 /*
-GetPrettyOutput - function returns exchange rates as formatted table
+CreatePrettyOutput - function returns exchange rates as formatted table
 depending on the tableType field:
 for type A and B tables a column with an average rate is printed,
 for type C two columns: buy price and sell price
@@ -356,10 +356,11 @@ Parameters:
 
     lang - 'en' or 'pl'
 */
-func (c *NBPCurrency) GetPrettyOutput(lang string) string {
+func (c *NBPCurrency) CreatePrettyOutput(lang string) string {
 	const padding = 3
 	var builder strings.Builder
 	var output string
+	var total, totalBuy, totalSell float64
 
 	// output language
 	setLang(lang)
@@ -377,7 +378,15 @@ func (c *NBPCurrency) GetPrettyOutput(lang string) string {
 		fmt.Fprintln(w, l.Get("----- \t ---- \t -------------"))
 		for _, currencyItem := range c.Exchange.Rates {
 			currencyValue := fmt.Sprintf("%.4f", currencyItem.Mid)
+			total += currencyItem.Mid
 			fmt.Fprintln(w, currencyItem.No+" \t "+currencyItem.EffectiveDate+" \t "+currencyValue)
+		}
+
+		if len(c.Exchange.Rates) > 1 {
+			avg := total / float64(len(c.Exchange.Rates))
+			fmt.Fprintln(w)
+			fmt.Fprintln(w, l.Get("The average exchange rate (from downloaded): "), fmt.Sprintf("%.4f", avg))
+			fmt.Fprintln(w)
 		}
 	} else {
 		output += fmt.Sprintln()
@@ -391,16 +400,29 @@ func (c *NBPCurrency) GetPrettyOutput(lang string) string {
 		for _, currencyItem := range c.ExchangeC.Rates {
 			currencyValueBid := fmt.Sprintf("%.4f", currencyItem.Bid)
 			currencyValueAsk := fmt.Sprintf("%.4f", currencyItem.Ask)
+			totalBuy += currencyItem.Bid
+			totalSell += currencyItem.Ask
 			fmt.Fprintln(w, currencyItem.No+" \t "+currencyItem.EffectiveDate+" \t "+currencyValueBid+" \t "+currencyValueAsk)
 		}
+
+		if len(c.ExchangeC.Rates) > 1 {
+			avgBuy := totalBuy / float64(len(c.ExchangeC.Rates))
+			avgSell := totalSell / float64(len(c.ExchangeC.Rates))
+
+			fmt.Fprintln(w)
+			fmt.Fprintln(w, l.Get("Buy: the average exchange rate (from downloaded): "), fmt.Sprintf("%.4f", avgBuy))
+			fmt.Fprintln(w, l.Get("Sell: the average exchange rate (from downloaded): "), fmt.Sprintf("%.4f", avgSell))
+			fmt.Fprintln(w)
+		}
 	}
+
 	w.Flush()
 
 	return output + builder.String()
 }
 
 /*
-GetCSVOutput - function returns currency rates,
+CreateCSVOutput - function returns currency rates,
 in the form of CSV (data separated by a comma), depending on the
 tableType field: for type A and B tables a column with an average
 rate is printed, for type C two columns: buy price and sell price
@@ -409,7 +431,7 @@ Parameters:
 
     lang - 'en' or 'pl'
 */
-func (c *NBPCurrency) GetCSVOutput(lang string) string {
+func (c *NBPCurrency) CreateCSVOutput(lang string) string {
 	var output string = ""
 
 	// output language
@@ -433,8 +455,8 @@ func (c *NBPCurrency) GetCSVOutput(lang string) string {
 	return output
 }
 
-// GetRawOutput - function print just result of request (json or xml)
-func (c *NBPCurrency) GetRawOutput() string {
+// CreateRawOutput - function print just result of request (json or xml)
+func (c *NBPCurrency) CreateRawOutput() string {
 	return string(c.result)
 }
 

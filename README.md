@@ -108,9 +108,9 @@ More examples in the \ example folder.
       - GetTableByDay 
       - GetTableCByDay
     * methods that return data (downloaded previously by TableByDate, or TableLast methods) as text, ready to be printed or saved to a file:
-	  - GetPrettyOutput 
-      - GetCSVOutput
-      - GetRawOutput
+	  - CreatePrettyOutput 
+      - CreateCSVOutput
+      - CreateRawOutput
     * other methods:
       - SetTableType
 2. **NBPCurrency** type - particular currency exchange rates:
@@ -125,9 +125,9 @@ More examples in the \ example folder.
       - GetRateToday
       - GetRateByDate
     * methods that return data (downloaded previously) as text, ready to be printed or saved to a file:
-      - GetPrettyOutput 
-      - GetCSVOutput 
-      - GetRawOutput
+      - CreatePrettyOutput 
+      - CreateCSVOutput 
+      - CreateRawOutput
     * other methods:
       - SetTableType
 3. **NBPGold** type - gold prices:
@@ -141,9 +141,9 @@ More examples in the \ example folder.
       - GetPriceCurrent 
       - GetPriceByDate
     * methods that return data (downloaded previously) as text, ready to be printed or saved to a file:
-      - GetPrettyOutput 
-      - GetCSVOutput 
-      - GetRawOutput
+      - CreatePrettyOutput 
+      - CreateCSVOutput 
+      - CreateRawOutput
 
 
 Detailed documentation:    
@@ -231,6 +231,28 @@ type NBPCurrency struct {
 func NewCurrency(tableType string) *NBPCurrency
     NewCurrency - function creates new currency type
 
+func (c *NBPCurrency) CreateCSVOutput(lang string) string
+    CreateCSVOutput - function returns currency rates, in the form of CSV (data
+    separated by a comma), depending on the tableType field: for type A and B
+    tables a column with an average rate is printed, for type C two columns: buy
+    price and sell price
+
+    Parameters:
+
+        lang - 'en' or 'pl'
+
+func (c *NBPCurrency) CreatePrettyOutput(lang string) string
+    CreatePrettyOutput - function returns exchange rates as formatted table
+    depending on the tableType field: for type A and B tables a column with an
+    average rate is printed, for type C two columns: buy price and sell price
+
+    Parameters:
+
+        lang - 'en' or 'pl'
+
+func (c *NBPCurrency) CreateRawOutput() string
+    CreateRawOutput - function print just result of request (json or xml)
+
 func (c *NBPCurrency) CurrencyByDate(code, date string) error
     CurrencyByDate - function downloads and writes data to exchange (exchangeC)
     slice, raw data (json) still available in result field
@@ -294,25 +316,6 @@ func (c *NBPCurrency) CurrencyToday(code string) error
         code - ISO 4217 currency code, depending on the type of the
         table available currencies may vary
 
-func (c *NBPCurrency) GetCSVOutput(lang string) string
-    GetCSVOutput - function returns currency rates, in the form of CSV (data
-    separated by a comma), depending on the tableType field: for type A and B
-    tables a column with an average rate is printed, for type C two columns: buy
-    price and sell price
-
-    Parameters:
-
-        lang - 'en' or 'pl'
-
-func (c *NBPCurrency) GetPrettyOutput(lang string) string
-    GetPrettyOutput - function returns exchange rates as formatted table
-    depending on the tableType field: for type A and B tables a column with an
-    average rate is printed, for type C two columns: buy price and sell price
-
-    Parameters:
-
-        lang - 'en' or 'pl'
-
 func (c *NBPCurrency) GetRateByDate(code, date string) ([]Rate, error)
     GetRateByDate - function downloads today's currency exchange rate and
     returns slice of Rate struct (or error)
@@ -344,9 +347,6 @@ func (c *NBPCurrency) GetRateToday(code string) (Rate, error)
         code - ISO 4217 currency code, depending on the type of the
         table available currencies may vary
 
-func (c *NBPCurrency) GetRawOutput() string
-    GetRawOutput - function print just result of request (json or xml)
-
 func (c *NBPCurrency) SetTableType(tableType string) error
     SetTableType - the function allows to set the supported type of exchange
     rate table
@@ -362,20 +362,23 @@ type NBPGold struct {
 func NewGold() *NBPGold
     NewGold - function creates new gold type
 
-func (g *NBPGold) GetCSVOutput(lang string) string
-    GetCSVOutput - function returns prices of gold in CSV format (comma
+func (g *NBPGold) CreateCSVOutput(lang string) string
+    CreateCSVOutput - function returns prices of gold in CSV format (comma
     separated data)
 
     Parameters:
 
         lang - 'en' or 'pl'
 
-func (g *NBPGold) GetPrettyOutput(lang string) string
-    GetPrettyOutput - function returns a formatted table of gold prices
+func (g *NBPGold) CreatePrettyOutput(lang string) string
+    CreatePrettyOutput - function returns a formatted table of gold prices
 
     Parameters:
 
         lang - 'en' or 'pl'
+
+func (g *NBPGold) CreateRawOutput() string
+    CreateRawOutput - function returns just result of request (json or xml)
 
 func (g *NBPGold) GetPriceByDate(date string) ([]GoldRate, error)
     GetPriceByDate - function returns gold prices (as slice of struct), by date
@@ -394,9 +397,6 @@ func (g *NBPGold) GetPriceCurrent() (GoldRate, error)
 func (g *NBPGold) GetPriceToday() (GoldRate, error)
     GetPriceToday - function downloads and returns today's gold price, as
     GoldRate struct
-
-func (g *NBPGold) GetRawOutput() string
-    GetRawOutput - function returns just result of request (json or xml)
 
 func (g *NBPGold) GoldByDate(date string) error
     GoldByDate - function downloads and writes data to goldRates slice, raw data
@@ -451,9 +451,9 @@ type NBPTable struct {
 func NewTable(tableType string) *NBPTable
     NewTable - function creates new table type
 
-func (t *NBPTable) GetCSVOutput(lang string) string
-    GetCSVOutput - function prints tables of exchange rates in the console, in
-    the form of CSV (data separated by a comma), depending on the tableType
+func (t *NBPTable) CreateCSVOutput(lang string) string
+    CreateCSVOutput - function prints tables of exchange rates in the console,
+    in the form of CSV (data separated by a comma), depending on the tableType
     field: for type A and B tables a column with an average rate is printed, for
     type C two columns: buy price and sell price
 
@@ -461,8 +461,8 @@ func (t *NBPTable) GetCSVOutput(lang string) string
 
         lang - 'en' or 'pl'
 
-func (t *NBPTable) GetPrettyOutput(lang string) string
-    GetPrettyOutput - function returns tables of exchange rates as formatted
+func (t *NBPTable) CreatePrettyOutput(lang string) string
+    CreatePrettyOutput - function returns tables of exchange rates as formatted
     table, depending on the tableType field: for type A and B tables a column
     with an average rate is printed, for type C two columns: buy price and sell
     price
@@ -471,8 +471,8 @@ func (t *NBPTable) GetPrettyOutput(lang string) string
 
         lang - 'en' or 'pl'
 
-func (t *NBPTable) GetRawOutput() string
-    GetRawOutput - function returns just result of request (json or xml)
+func (t *NBPTable) CreateRawOutput() string
+    CreateRawOutput - function returns just result of request (json or xml)
 
 func (t *NBPTable) GetTableByDate(date string) ([]ExchangeTable, error)
     GetTableByDate - function retrieves a table of exchange rates for a given

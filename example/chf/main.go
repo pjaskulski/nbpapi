@@ -20,7 +20,10 @@ func main() {
 		fmt.Println(err)
 	} else {
 		// print polish version
-		fmt.Println(client.GetPrettyOutput("pl"))
+		fmt.Println(client.CreatePrettyOutput("pl"))
+		fmt.Println()
+		// print english version
+		fmt.Println(client.CreatePrettyOutput("en"))
 		fmt.Println()
 	}
 	fmt.Println()
