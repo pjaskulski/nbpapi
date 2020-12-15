@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+const txtRandomErr = "randomInteger returned value outside expected range"
+
 func TestLittleDelayShouldBeBetween400And650(t *testing.T) {
 	for i := 1; i <= 10; i++ {
 		start := time.Now()
@@ -22,16 +24,16 @@ func TestRandomInteger(t *testing.T) {
 
 	test = randomInteger(400, 650)
 	if test < 400 || test > 650 {
-		t.Errorf("randomInteger returned value outside expected range")
+		t.Errorf(txtRandomErr)
 	}
 
 	test = randomInteger(100, 150)
 	if test < 100 || test > 150 {
-		t.Errorf("randomInteger returned value outside expected range")
+		t.Errorf(txtRandomErr)
 	}
 
 	test = randomInteger(500, 900)
 	if test < 500 || test > 900 {
-		t.Errorf("randomInteger returned value outside expected range")
+		t.Errorf(txtRandomErr)
 	}
 }

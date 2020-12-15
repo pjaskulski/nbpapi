@@ -33,7 +33,7 @@ func TestGetCurrencyCurrent(t *testing.T) {
 
 	err := client.CurrencyByDate(currency, "current")
 	if err != nil {
-		t.Errorf("expected: err == nil, received: err != nil")
+		t.Errorf(txtWantNil)
 	}
 
 	if client.Exchange.Table != table {
@@ -68,7 +68,7 @@ func TestGetCurrencyCurrentXXX(t *testing.T) {
 
 	_, err := client.GetRateCurrent(currency)
 	if err == nil {
-		t.Errorf("expected: err != nil, received: err == nil")
+		t.Errorf(txtWantErr)
 	}
 }
 
@@ -95,11 +95,11 @@ func TestGetCurrencyDay(t *testing.T) {
 
 	err := client.CurrencyByDate(currency, day)
 	if err != nil {
-		t.Errorf("expected: err == nil, received: err != nil")
+		t.Errorf(txtWantNil)
 	}
 
 	if !json.Valid(client.result) {
-		t.Errorf("incorrect json content was received")
+		t.Errorf(txtIncorrectJSON)
 	}
 
 	if client.Exchange.Rates[0].EffectiveDate != day {
@@ -160,11 +160,11 @@ func TestGetCurrencyDayTableC(t *testing.T) {
 
 	err := client.CurrencyByDate(currency, day)
 	if err != nil {
-		t.Errorf("expected: err == nil, received: err != nil")
+		t.Errorf(txtWantNil)
 	}
 
 	if !json.Valid(client.result) {
-		t.Errorf("incorrect json content was received")
+		t.Errorf(txtIncorrectJSON)
 	}
 
 	if client.ExchangeC.Rates[0].EffectiveDate != day {
@@ -198,7 +198,7 @@ func TestGetCurrencyDaySaturdayFailed(t *testing.T) {
 
 	err := client.CurrencyByDate(currency, day)
 	if err == nil {
-		t.Errorf("expected: err != nil, received: err == nil")
+		t.Errorf(txtWantErr)
 	}
 }
 
@@ -229,7 +229,7 @@ func TestGetCurrencyLast(t *testing.T) {
 
 	err := client.CurrencyLast(currency, last)
 	if err != nil {
-		t.Errorf("expected: err == nil, received: err != nil")
+		t.Errorf(txtWantNil)
 	}
 	if len(client.Exchange.Rates) != 5 {
 		t.Errorf("want: %d, got: %d", last, len(client.Exchange.Rates))
@@ -263,7 +263,7 @@ func TestGetCurrencyLastTableC(t *testing.T) {
 
 	err := client.CurrencyLast(currency, last)
 	if err != nil {
-		t.Errorf("expected: err == nil, received: err != nil")
+		t.Errorf(txtWantNil)
 	}
 	if len(client.ExchangeC.Rates) != 5 {
 		t.Errorf("want: %d, got: %d", last, len(client.ExchangeC.Rates))
@@ -292,7 +292,7 @@ func TestGetCurrencyLastFailed(t *testing.T) {
 
 	err := client.CurrencyLast(currency, last)
 	if err == nil {
-		t.Errorf("expected: err != nil, received: err == nil")
+		t.Errorf(txtWantErr)
 	}
 }
 
@@ -320,7 +320,7 @@ func TestGetCurrencyRange(t *testing.T) {
 
 	result, err := client.GetRateByDate(currency, day)
 	if err != nil {
-		t.Errorf("expected: err == nil, received: err != nil")
+		t.Errorf(txtWantNil)
 	}
 
 	var ratesCount int = len(result)
@@ -352,14 +352,14 @@ func TestGetCurrencyRangeFailed(t *testing.T) {
 
 	_, err := client.GetRateByDate(currency, day)
 	if err == nil {
-		t.Errorf("expected: err != nil, received: err == nil")
+		t.Errorf(txtWantErr)
 	}
 }
 
 func TestGetCurrencyToday(t *testing.T) {
 	var table string = "A"
 	var currency string = "CHF"
-	day := time.Now().Format("2006-01-02")
+	day := time.Now().Format(dateFormat)
 
 	if useMock {
 		httpmock.Activate()
@@ -395,7 +395,7 @@ func TestGetCurrencyToday(t *testing.T) {
 	if err == nil {
 		_, err := client.GetRateToday(currency)
 		if err != nil {
-			t.Errorf("expected: err == nil, received: err != nil")
+			t.Errorf(txtWantNil)
 		}
 	}
 }
@@ -526,10 +526,10 @@ func TestCurrencyRaw(t *testing.T) {
 
 	err := client.CurrencyRaw("EUR", "2020-12-02", 0, "json")
 	if err != nil {
-		t.Errorf("want err == nil, got err != nil")
+		t.Errorf(txtWantNil)
 	}
 	if !json.Valid(client.result) {
-		t.Errorf("incorrect json content was received")
+		t.Errorf(txtIncorrectJSON)
 	}
 }
 
@@ -564,7 +564,7 @@ func TestCurrencyRawXML(t *testing.T) {
 
 	err := client.CurrencyRaw("EUR", "2020-12-02", 0, "xml")
 	if err != nil {
-		t.Errorf("want err == nil, got err != nil")
+		t.Errorf(txtWantNil)
 	}
 	if !IsValidXML(string(client.result)) {
 		t.Errorf("incorrect xml content was received")
@@ -572,7 +572,7 @@ func TestCurrencyRawXML(t *testing.T) {
 }
 
 func TestCurrencyToday(t *testing.T) {
-	day := time.Now().Format("2006-01-02")
+	day := time.Now().Format(dateFormat)
 	var code string = "CHF"
 	var table string = "C"
 
@@ -609,7 +609,7 @@ func TestCurrencyToday(t *testing.T) {
 	if err == nil {
 		err = client.CurrencyToday(code)
 		if err != nil {
-			t.Errorf("want: err == nil, got: err != nil")
+			t.Errorf(txtWantNil)
 		}
 	}
 }
@@ -633,7 +633,7 @@ func TestGetRateCurrent(t *testing.T) {
 
 	result, err := client.GetRateCurrent("CHF")
 	if err != nil {
-		t.Errorf("want: err == nil, got: err != nil")
+		t.Errorf(txtWantNil)
 	}
 
 	if result.Ask == 0 && result.Bid == 0 {
@@ -660,7 +660,7 @@ func TestGetRateCurrentB(t *testing.T) {
 
 	result, err := client.GetRateCurrent("ETB")
 	if err != nil {
-		t.Errorf("want: err == nil, got: err != nil")
+		t.Errorf(txtWantNil)
 	}
 
 	if result.Mid == 0 {
@@ -669,7 +669,7 @@ func TestGetRateCurrentB(t *testing.T) {
 }
 
 func TestGetRateToday(t *testing.T) {
-	day := time.Now().Format("2006-01-02")
+	day := time.Now().Format(dateFormat)
 	var code string = "CHF"
 	var table string = "C"
 
@@ -708,7 +708,7 @@ func TestGetRateToday(t *testing.T) {
 	if err == nil {
 		result, err := client.GetRateToday(code)
 		if err != nil {
-			t.Errorf("want: err == nil, got: err != nil")
+			t.Errorf(txtWantNil)
 		}
 
 		if result.Ask == 0 && result.Bid == 0 {

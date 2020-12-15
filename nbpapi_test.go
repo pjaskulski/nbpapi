@@ -5,6 +5,11 @@ import (
 	"os"
 )
 
+const dateFormat = "2006-01-02"
+const txtIncorrectJSON = "incorrect json content was received"
+const txtWantNil = "want: err == nil, got: err != nil"
+const txtWantErr = "expected: err != nil, received: err == nil"
+
 var useMock bool
 
 func init() {

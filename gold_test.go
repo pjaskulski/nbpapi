@@ -16,7 +16,7 @@ func TestGetGoldCurrent(t *testing.T) {
 		httpmock.Activate()
 		defer httpmock.DeactivateAndReset()
 
-		today := time.Now().Format("2006-01-01")
+		today := time.Now().Format(dateFormat)
 		httpmock.RegisterResponder("GET", baseAddressGold,
 			httpmock.NewStringResponder(200, `[{"data":"`+today+`","cena":717.83}]`))
 	} else {
@@ -27,11 +27,11 @@ func TestGetGoldCurrent(t *testing.T) {
 	result, err := apiClient.GetPriceCurrent()
 
 	if err != nil {
-		t.Errorf("expected: err == nil, received: err != nil")
+		t.Errorf(txtWantNil)
 	}
 
 	if !json.Valid(apiClient.result) {
-		t.Errorf("incorrect json content was received")
+		t.Errorf(txtIncorrectJSON)
 	}
 
 	if result.Price <= 0 {
@@ -40,7 +40,7 @@ func TestGetGoldCurrent(t *testing.T) {
 }
 
 func TestGetGoldToday(t *testing.T) {
-	today := time.Now().Format("2006-01-02")
+	today := time.Now().Format(dateFormat)
 	var err error
 
 	if useMock {
@@ -69,13 +69,13 @@ func TestGetGoldToday(t *testing.T) {
 	if err == nil {
 		_, err := apiClient.GetPriceToday()
 		if err != nil {
-			t.Errorf("expected: err == nil, received: err != nil")
+			t.Errorf(txtWantNil)
 		}
 	}
 }
 
 func TestGetGoldTodayFailedBecaueOfWeekend(t *testing.T) {
-	today := time.Now().Format("2006-01-02")
+	today := time.Now().Format(dateFormat)
 	var err error
 
 	if useMock {
@@ -105,7 +105,7 @@ func TestGetGoldTodayFailedBecaueOfWeekend(t *testing.T) {
 	if err != nil {
 		_, err := apiClient.GetPriceToday()
 		if err == nil {
-			t.Errorf("expected: err != nil, received: err == nil")
+			t.Errorf(txtWantErr)
 		}
 	}
 }
@@ -128,10 +128,10 @@ func TestGetGoldDay(t *testing.T) {
 
 	err := apiClient.GoldByDate(day)
 	if err != nil {
-		t.Errorf("expected: err == nil, received: err != nil")
+		t.Errorf(txtWantNil)
 	}
 	if !json.Valid(apiClient.result) {
-		t.Errorf("incorrect json content was received")
+		t.Errorf(txtIncorrectJSON)
 	}
 
 	if apiClient.GoldRates[0].Data != day {
@@ -159,7 +159,7 @@ func TestGetGoldDayShouldFailedOnSunday(t *testing.T) {
 	_, err := apiClient.GetPriceByDate(day)
 
 	if err == nil {
-		t.Errorf("expected: err != nil, received: err == nil")
+		t.Errorf(txtWantErr)
 	}
 }
 
@@ -185,10 +185,10 @@ func TestGetGoldLast(t *testing.T) {
 	err := apiClient.GoldLast(lastNo)
 
 	if err != nil {
-		t.Errorf("expected: err == nil, received: err != nil")
+		t.Errorf(txtWantNil)
 	}
 	if !json.Valid(apiClient.result) {
-		t.Errorf("incorrect json content was received")
+		t.Errorf(txtIncorrectJSON)
 	}
 
 	if len(apiClient.GoldRates) != lastNo {
@@ -216,11 +216,11 @@ func TestGetGoldRange(t *testing.T) {
 
 	err := apiClient.GoldByDate(day)
 	if err != nil {
-		t.Errorf("expected: err == nil, received: err != nil")
+		t.Errorf(txtWantNil)
 	}
 
 	if !json.Valid(apiClient.result) {
-		t.Errorf("incorrect json content was received")
+		t.Errorf(txtIncorrectJSON)
 	}
 
 	if len(apiClient.GoldRates) != 2 {
@@ -298,7 +298,7 @@ func TestShouldGetGoldCurrentWithSuccess(t *testing.T) {
 
 func TestGetPriceToday(t *testing.T) {
 	var err error
-	today := time.Now().Format("2006-01-02")
+	today := time.Now().Format(dateFormat)
 
 	if useMock {
 		httpmock.Activate()
@@ -326,7 +326,7 @@ func TestGetPriceToday(t *testing.T) {
 	if err == nil {
 		_, err := apiClient.GetPriceToday()
 		if err != nil {
-			t.Errorf("expected: err == nil, received: err != nil")
+			t.Errorf(txtWantNil)
 		}
 	}
 }
@@ -352,7 +352,7 @@ func TestGetPriceCurrentShouldReturnNonZeroPrice(t *testing.T) {
 	result, err = apiClient.GetPriceCurrent()
 
 	if err != nil {
-		t.Errorf("expected: err == nil, received: err != nil")
+		t.Errorf(txtWantNil)
 	}
 
 	if result.Price <= 0 {
@@ -461,7 +461,7 @@ func TestGoldGetCSVOutputShouldReturnCSVData(t *testing.T) {
 	err = apiClient.GoldByDate("current")
 
 	if err != nil {
-		t.Errorf("expected: err == nil, received: err != nil")
+		t.Errorf(txtWantNil)
 	}
 
 	result = apiClient.CreateCSVOutput("en")
@@ -496,7 +496,7 @@ func TestGoldGetPrettyOutputShouldReturnPrettyText(t *testing.T) {
 	err = apiClient.GoldByDate("current")
 
 	if err != nil {
-		t.Errorf("expected: err == nil, received: err != nil")
+		t.Errorf(txtWantNil)
 	}
 
 	result = apiClient.CreatePrettyOutput("en")
@@ -593,10 +593,10 @@ func TestGoldRaw(t *testing.T) {
 
 	err := client.GoldRaw("2020-12-02", 0, "json")
 	if err != nil {
-		t.Errorf("want err == nil, got err != nil")
+		t.Errorf(txtWantNil)
 	}
 	if !json.Valid(client.result) {
-		t.Errorf("incorrect json content was received")
+		t.Errorf(txtIncorrectJSON)
 	}
 }
 
@@ -623,7 +623,7 @@ func TestGoldRawXML(t *testing.T) {
 
 	err := client.GoldRaw("2020-12-02", 0, "xml")
 	if err != nil {
-		t.Errorf("want err == nil, got err != nil")
+		t.Errorf(txtWantNil)
 	}
 	if !IsValidXML(string(client.result)) {
 		t.Errorf("incorrect xml content was received")

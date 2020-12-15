@@ -26,7 +26,7 @@ func TestTableByDateCurrent(t *testing.T) {
 
 	err := client.TableByDate("current")
 	if err != nil {
-		t.Errorf("expected: err == nil, received: err != nil")
+		t.Errorf(txtWantNil)
 	}
 	if !json.Valid(client.result) {
 		t.Errorf("incorrect json content was received")
@@ -52,10 +52,10 @@ func TestTableByDate(t *testing.T) {
 
 	err := client.TableByDate(day)
 	if err != nil {
-		t.Errorf("expected: err == nil, received: err != nil")
+		t.Errorf(txtWantNil)
 	}
 	if !json.Valid(client.result) {
-		t.Errorf("incorrect json content was received")
+		t.Errorf(txtIncorrectJSON)
 	}
 
 	if client.Exchange[0].Table != table {
@@ -87,10 +87,10 @@ func TestTableByDateRange(t *testing.T) {
 
 	err := client.TableByDate(day)
 	if err != nil {
-		t.Errorf("expected: err == nil, received: err != nil")
+		t.Errorf(txtWantNil)
 	}
 	if !json.Valid(client.result) {
-		t.Errorf("incorrect json content was received")
+		t.Errorf(txtIncorrectJSON)
 	}
 
 	if len(client.Exchange) != 2 {
@@ -124,10 +124,10 @@ func TestTableLast(t *testing.T) {
 	err := client.TableLast(lastNo)
 
 	if err != nil {
-		t.Errorf("expected: err == nil, received: err != nil")
+		t.Errorf(txtWantNil)
 	}
 	if !json.Valid(client.result) {
-		t.Errorf("incorrect json content was received")
+		t.Errorf(txtIncorrectJSON)
 	}
 
 	if len(client.Exchange) != 5 {
@@ -174,7 +174,7 @@ func TestTableByDateToday(t *testing.T) {
 	if err == nil {
 		err := client.TableByDate("today")
 		if err != nil {
-			t.Errorf("expected: err == nil, received: err != nil")
+			t.Errorf(txtWantNil)
 		}
 	}
 }
@@ -197,7 +197,7 @@ func TestTableByDateFailed(t *testing.T) {
 
 	err := client.TableByDate("today")
 	if err == nil {
-		t.Errorf("expected: err != nil, received: err != nil")
+		t.Errorf(txtWantErr)
 	}
 }
 
@@ -310,10 +310,10 @@ func TestTableRaw(t *testing.T) {
 
 	err := client.TableRaw("2020-12-07", 0, "json")
 	if err != nil {
-		t.Errorf("want err == nil, got err != nil")
+		t.Errorf(txtWantNil)
 	}
 	if !json.Valid(client.result) {
-		t.Errorf("incorrect json content was received")
+		t.Errorf(txtIncorrectJSON)
 	}
 }
 
@@ -332,7 +332,7 @@ func TestTableRawXML(t *testing.T) {
 
 	err := client.TableRaw("2020-12-07", 0, "xml")
 	if err != nil {
-		t.Errorf("want err == nil, got err != nil")
+		t.Errorf(txtWantNil)
 	}
 	if !IsValidXML(string(client.result)) {
 		t.Errorf("incorrect xml content was received")
@@ -354,7 +354,7 @@ func TestGetTableRawOutput(t *testing.T) {
 
 	err := client.TableRaw("2020-12-07", 0, "json")
 	if err != nil {
-		t.Errorf("want err == nil, got err != nil")
+		t.Errorf(txtWantNil)
 	}
 
 	output := client.CreateRawOutput()
@@ -379,7 +379,7 @@ func TestGetTableCurrent(t *testing.T) {
 	client := NewTable("A")
 	_, err := client.GetTableCurrent()
 	if err != nil {
-		t.Errorf("want: err == nil, got err != nil")
+		t.Errorf(txtWantNil)
 	}
 }
 
@@ -399,7 +399,7 @@ func TestGetTableCurrentFailed(t *testing.T) {
 	client := NewTable("C")
 	_, err := client.GetTableCurrent()
 	if err == nil {
-		t.Errorf("want: err != nil, got err == nil")
+		t.Errorf(txtWantErr)
 	}
 }
 
@@ -419,7 +419,7 @@ func TestGetTableCCurrent(t *testing.T) {
 	client := NewTable("C")
 	_, err := client.GetTableCCurrent()
 	if err != nil {
-		t.Errorf("want: err == nil, got err != nil")
+		t.Errorf(txtWantNil)
 	}
 }
 
@@ -440,12 +440,12 @@ func TestGetTableCCurrentFailedBecauseOfWrongType(t *testing.T) {
 
 	_, err := client.GetTableCCurrent()
 	if err == nil {
-		t.Errorf("want: err != nil, got err == nil")
+		t.Errorf(txtWantErr)
 	}
 }
 
 func TestGetTableToday(t *testing.T) {
-	today := time.Now().Format("2006-01-02")
+	today := time.Now().Format(dateFormat)
 
 	if useMock {
 		httpmock.Activate()
@@ -480,7 +480,7 @@ func TestGetTableToday(t *testing.T) {
 	if err == nil {
 		_, err := client.GetTableToday() // if it works for ..ByDay, should works for ..Today
 		if err != nil {
-			t.Errorf("want: err == nil, got err != nil")
+			t.Errorf(txtWantNil)
 		}
 	}
 }
@@ -500,12 +500,12 @@ func TestGetTableTodayShouldFailedBecauseOfWrongType(t *testing.T) {
 
 	_, err := client.GetTableToday() // wrong func for C table type, should be GetTableCToday
 	if err == nil {
-		t.Errorf("want: err != nil, got err == nil")
+		t.Errorf(txtWantErr)
 	}
 }
 
 func TestGetTableTodayShouldFailedBecauseOfWeekend(t *testing.T) {
-	today := time.Now().Format("2006-01-02")
+	today := time.Now().Format(dateFormat)
 
 	if useMock {
 		httpmock.Activate()
@@ -537,13 +537,13 @@ func TestGetTableTodayShouldFailedBecauseOfWeekend(t *testing.T) {
 	if err != nil {
 		_, err := client.GetTableToday()
 		if err == nil {
-			t.Errorf("want: err != nil, got err == nil")
+			t.Errorf(txtWantErr)
 		}
 	}
 }
 
 func TestGetTableCToday(t *testing.T) {
-	today := time.Now().Format("2006-01-02")
+	today := time.Now().Format(dateFormat)
 
 	if useMock {
 		httpmock.Activate()
@@ -575,7 +575,7 @@ func TestGetTableCToday(t *testing.T) {
 	if err == nil {
 		_, err := client.GetTableCToday() // if it works for ..ByDay, should works for ..Today
 		if err != nil {
-			t.Errorf("want: err == nil, got err != nil")
+			t.Errorf(txtWantNil)
 		}
 	}
 }
@@ -595,12 +595,12 @@ func TestGetTableTodayCFailedBecauseOfWrongType(t *testing.T) {
 
 	_, err := client.GetTableCToday() // wrong func for A table type
 	if err == nil {
-		t.Errorf("want: err != nil, got err == nil")
+		t.Errorf(txtWantErr)
 	}
 }
 
 func TestGetTableCTodayShouldFailedBecauseOfWeekend(t *testing.T) {
-	today := time.Now().Format("2006-01-02")
+	today := time.Now().Format(dateFormat)
 
 	if useMock {
 		httpmock.Activate()
@@ -631,7 +631,7 @@ func TestGetTableCTodayShouldFailedBecauseOfWeekend(t *testing.T) {
 	if err != nil {
 		_, err := client.GetTableCToday()
 		if err == nil {
-			t.Errorf("want: err != nil, got err == nil")
+			t.Errorf(txtWantErr)
 		}
 	}
 }
@@ -653,7 +653,7 @@ func TestGetTableByDate(t *testing.T) {
 
 	_, err := client.GetTableByDate(day)
 	if err != nil {
-		t.Errorf("want: err == nil, got err != nil")
+		t.Errorf(txtWantNil)
 	}
 }
 
@@ -674,7 +674,7 @@ func TestGetTableByDateFailedBecauseOfWrongType(t *testing.T) {
 
 	_, err := client.GetTableByDate(day)
 	if err == nil {
-		t.Errorf("want: err != nil, got err == nil")
+		t.Errorf(txtWantErr)
 	}
 }
 
@@ -695,7 +695,7 @@ func TestGetTableCByDate(t *testing.T) {
 
 	_, err := client.GetTableCByDate(day)
 	if err != nil {
-		t.Errorf("want: err == nil, got err != nil")
+		t.Errorf(txtWantNil)
 	}
 }
 
@@ -716,7 +716,7 @@ func TestGetTableCByDateFailedBecauseOfWrongType(t *testing.T) {
 
 	_, err := client.GetTableCByDate(day)
 	if err == nil {
-		t.Errorf("want: err != nil, got err == nil")
+		t.Errorf(txtWantErr)
 	}
 }
 
@@ -807,10 +807,10 @@ func TestTableCByDate(t *testing.T) {
 
 	err := client.TableByDate(day)
 	if err != nil {
-		t.Errorf("expected: err == nil, received: err != nil")
+		t.Errorf(txtWantNil)
 	}
 	if !json.Valid(client.result) {
-		t.Errorf("incorrect json content was received")
+		t.Errorf(txtIncorrectJSON)
 	}
 
 	if client.ExchangeC[0].Table != table {
@@ -843,10 +843,10 @@ func TestTableLastC(t *testing.T) {
 	err := client.TableLast(lastNo)
 
 	if err != nil {
-		t.Errorf("expected: err == nil, received: err != nil")
+		t.Errorf(txtWantNil)
 	}
 	if !json.Valid(client.result) {
-		t.Errorf("incorrect json content was received")
+		t.Errorf(txtIncorrectJSON)
 	}
 
 	if len(client.ExchangeC) != 5 {

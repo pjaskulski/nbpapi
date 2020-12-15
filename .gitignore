@@ -21,3 +21,5 @@ doc.txt
 # vs code
 *.code-workspace
 .vscode/
+.scannerwork/
+sonar-project.properties
