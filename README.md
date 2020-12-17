@@ -94,6 +94,9 @@ More examples in the \ example folder.
 
 ## Documentation:
 
+0. Global functions:
+    * EnableCache
+    * DisableCache
 1. **NBPTable** type - complete tables of currency exchange rates:
     * create new: `client := NewTable("C")`
     * methods that downloading data into NBPTable type structures:
