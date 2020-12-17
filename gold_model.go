@@ -1,6 +1,8 @@
 package nbpapi
 
-import "net/http"
+import (
+	"net/http"
+)
 
 // GoldRate type
 type GoldRate struct {

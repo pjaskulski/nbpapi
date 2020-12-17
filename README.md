@@ -160,6 +160,9 @@ var (
 )
     errors for invalid code, table type
 
+var CacheOn bool = false
+    CacheOn - is in-memory cache on/off
+
 var CurrencyValuesA = []string{"THB", "USD", "AUD", "HKD", "CAD", "NZD", "SGD", "EUR", "HUF", "CHF",
 	"GBP", "UAH", "JPY", "CZK", "DKK", "ISK", "NOK", "SEK", "HRK", "RON",
 	"BGN", "TRY", "ILS", "CLP", "PHP", "MXN", "ZAR", "BRL", "MYR", "RUB",
@@ -184,11 +187,20 @@ var CurrencyValuesC = []string{"USD", "AUD", "CAD", "EUR", "HUF", "CHF", "GBP", 
 	"SEK", "XDR"}
     CurrencyValuesC - list of supported currencies for table type C
 
+var Memory *cache.Cache
+    Memory - cache
+
 var TableValues = []string{"A", "B", "C"}
     TableValues - list of table types
 
 
 FUNCTIONS
+
+func DisableCache()
+    DisableCache func - turn off im-memory cache
+
+func EnableCache()
+    EnableCache func - turn on im-memory cache
 
 func IsValidXML(input string) bool
     IsValidXML - func from:

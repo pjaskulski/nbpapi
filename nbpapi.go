@@ -4,6 +4,8 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/patrickmn/go-cache"
 )
 
 // base addresses of the NBP API service
@@ -55,12 +57,23 @@ func setLang(lang string) {
 
    url - NBP web api address
    format - 'json' or 'xml'
+
+   Optionally, if the cache is turned on, the function trying to get data
+   from in-memory store.
 */
 func fetchData(client *http.Client, url, format string) ([]byte, error) {
 	if format == "json" {
 		format = "application/json"
 	} else if format == "xml" {
 		format = "application/xml"
+	}
+
+	// search in-memory store
+	if CacheOn {
+		value, found := Memory.Get(url)
+		if found {
+			return value.([]byte), nil
+		}
 	}
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
@@ -87,6 +100,11 @@ func fetchData(client *http.Client, url, format string) ([]byte, error) {
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		return nil, err
+	}
+
+	// save data to in-memory store
+	if CacheOn {
+		Memory.Set(url, data, cache.DefaultExpiration)
 	}
 
 	return data, nil

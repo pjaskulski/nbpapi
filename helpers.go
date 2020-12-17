@@ -9,6 +9,8 @@ import (
 	"math/rand"
 	"strings"
 	"time"
+
+	"github.com/patrickmn/go-cache"
 )
 
 // errors for invalid code, table type
@@ -16,6 +18,12 @@ var (
 	ErrInvalidCurrencyCode error = errors.New("Invalid currency code")
 	ErrInvalidTableType    error = errors.New("Invalid table type, allowed values: A, B or C")
 )
+
+// CacheOn - is in-memory cache on/off
+var CacheOn bool = false
+
+// Memory - cache
+var Memory *cache.Cache
 
 // littleDelay - delay function, so as not to bother the NBP server too much...
 func littleDelay() {
@@ -79,4 +87,16 @@ func IsValidXML(input string) bool {
 			return err == io.EOF
 		}
 	}
+}
+
+// EnableCache func - turn on im-memory cache
+func EnableCache() {
+	CacheOn = true
+	Memory = cache.New(60*time.Minute, 75*time.Minute)
+}
+
+// DisableCache func - turn off im-memory cache
+func DisableCache() {
+	CacheOn = false
+	Memory.Flush()
 }
