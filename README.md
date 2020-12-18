@@ -6,9 +6,19 @@
 [![go report](https://goreportcard.com/badge/github.com/pjaskulski/kursnbp)](https://goreportcard.com/report/github.com/pjaskulski/nbpapi) 
 
 
-Go library for NBP (National Bank of Poland) API: [http://api.nbp.pl/en.html](http://api.nbp.pl/en.html)
+Go library for NBP (National Bank of Poland) API: [http://api.nbp.pl/en.html](http://api.nbp.pl/en.html). 
 
-The library is used in the kursNBP project: [https://github.com/pjaskulski/kursnbp](https://github.com/pjaskulski/kursnbp)
+The module's functions allow you to download currency rates and prices of gold from the NBP API service. Three types have been prepared, corresponding to the basic information provided by the NBP. The **NBPTable** type is used to download full currency exchange rate tables. Three types of tables A, B and C are supported, tables A and B contain average currency prices, table C contains 'buy' and 'sell' prices. The TableRaw, TableByDate, TableLast methods allow to download the exchange rate table (or multiple tables) and save the result in internal structures of the NBPTable type. The GetTableCurrent, GetTableToday, etc. methods return the downloaded data in the form of slices of structs. Create[]...] methods return strings prepared for printing or saving to file, on the basis of data downloaded by Table[...] methods. 
+Other types work the same way: **NBPCurrency** - for downloading the rates of a particular currency, and **NBPGold** for downloading gold prices.
+
+## Module usage
+
+The library is used in the kursNBP project: [https://github.com/pjaskulski/kursnbp](https://github.com/pjaskulski/kursnbp).
+
+## Cache
+
+Optionally you can store the results of the query in the memory of your computer, by default the results are stored for 60 minutes, each time you call an identical query again it will return the results from the cache instead of querying the real API server.
+EnableCache turns on the caching mechanism, DisableCache turns it off (deleting the memory content).
 
 
 To install and use:
