@@ -17,8 +17,8 @@ The library is used in the kursNBP project: [https://github.com/pjaskulski/kursn
 
 ## Cache
 
-Optionally you can store the results of the query in the memory of your computer, by default the results are stored for 60 minutes, each time you call an identical query again it will return the results from the cache instead of querying the real API server.
-EnableCache turns on the caching mechanism, DisableCache turns it off (deleting the memory content).
+Optionally you can store the results of the query in the memory of your computer. If cache is enabled, the results are stored for 60 minutes by default, each time you call an identical query again API service it will return the results from the cache instead of querying the real NBP API server.
+Function EnableCache turns on the caching mechanism, DisableCache turns it off (deleting the memory content).
 
 
 To install and use:
