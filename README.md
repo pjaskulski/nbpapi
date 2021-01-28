@@ -11,6 +11,8 @@ Go client library (unofficial) for NBP (National Bank of Poland) API: [http://ap
 The module's functions allow you to download currency rates and prices of gold from the NBP API service. Three types have been prepared, corresponding to the basic information provided by the NBP. The **NBPTable** type is used to download full currency exchange rate tables. Three types of tables A, B, and C are supported, tables A and B contain average currency prices, table C contains 'buy' and 'sell' prices. The TableRaw, TableByDate, TableLast methods allow to download the exchange rate table (or multiple tables) and save the result in internal structures of the NBPTable type. The GetTableCurrent, GetTableToday, etc. methods return the downloaded data in the form of slices of structs. Create[]...] methods return strings prepared for printing or saving to file, based on data downloaded by Table[...] methods. 
 Other types work the same way: **NBPCurrency** - for downloading the rates of a particular currency, and **NBPGold** for downloading gold prices.
 
+**Disclaimer**: nbpapi client library is a private project, in no way related to the National Bank of Poland, except for the use of the NBP public API.
+
 ## Module usage
 
 The library is used in the kursNBP project: [https://github.com/pjaskulski/kursnbp](https://github.com/pjaskulski/kursnbp).
