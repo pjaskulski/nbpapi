@@ -82,6 +82,7 @@ func fetchData(client *http.Client, url, format string) ([]byte, error) {
 	}
 
 	req.Header.Set("Accept", format)
+	req.Header.Set("User-Agent", "")
 
 	r, err := client.Do(req)
 	if err != nil {
